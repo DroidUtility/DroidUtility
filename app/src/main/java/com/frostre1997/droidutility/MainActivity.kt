@@ -5,9 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import com.frostre1997.droidutility.data.SettingsManager
 import com.frostre1997.droidutility.ui.theme.DroidUtilityTheme
 import com.frostre1997.droidutility.ui.theme.ThemeMode
@@ -22,21 +25,37 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeModeFlow = settingsManager.getThemeModeFlow().collectAsState(initial = "SYSTEM")
             val dynamicColorFlow = settingsManager.getDynamicColorFlow().collectAsState(initial = false)
+            val accentColorFlow = settingsManager.getAccentColorFlow().collectAsState(initial = "blue")
+            val uiScaleFlow = settingsManager.getUIScaleFlow().collectAsState(initial = 1.0f)
+
             val themeMode by themeModeFlow
             val useDynamicColor by dynamicColorFlow
+            val accentColor by accentColorFlow
+            val uiScale by uiScaleFlow
 
             val mode = try {
                 ThemeMode.valueOf(themeMode)
             } catch (_: IllegalArgumentException) {
-                ThemeMode.SYSTEM   // fallback to SYSTEM
+                ThemeMode.SYSTEM
             }
+
+            // Create a custom Density that scales all dp/sp values
+            val density = LocalDensity.current
+            val scaledDensity = Density(
+                density = density.density * uiScale,
+                fontScale = density.fontScale * uiScale
+            )
 
             DroidUtilityTheme(
                 themeMode = mode,
-                useDynamicColor = useDynamicColor
+                useDynamicColor = useDynamicColor,
+                accentColorName = accentColor
             ) {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    MainScreen()
+                // Apply the scaled density to the entire app
+                CompositionLocalProvider(LocalDensity provides scaledDensity) {
+                    Surface(modifier = Modifier.fillMaxSize()) {
+                        MainScreen()
+                    }
                 }
             }
         }
