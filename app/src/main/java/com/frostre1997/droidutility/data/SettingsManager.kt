@@ -24,16 +24,14 @@ class SettingsManager(private val context: Context) {
         context.dataStore.edit { prefs -> prefs[SettingsDataStore.USE_DYNAMIC_COLOR] = enabled }
     }
 
-    // Accent Color
     fun getAccentColorFlow(): Flow<String> =
         context.dataStore.data.map { prefs ->
             prefs[SettingsDataStore.ACCENT_COLOR] ?: SettingsDataStore.getDefaultAccentColor()
         }
     suspend fun setAccentColor(color: String) {
-       context.dataStore.edit { prefs ->
-           prefs[SettingsDataStore.ACCENT_COLOR] = color
+        context.dataStore.edit { prefs -> prefs[SettingsDataStore.ACCENT_COLOR] = color }
     }
-    
+
     // === Terminal ===
     fun getTerminalFontSizeFlow(): Flow<Float> =
         context.dataStore.data.map { prefs ->
