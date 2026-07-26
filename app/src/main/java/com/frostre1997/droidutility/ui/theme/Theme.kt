@@ -12,57 +12,52 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val AccentBlue = Color(0xFF4FC3F7)
-private val AccentGreen = Color(0xFF66BB6A)
-private val AccentRed = Color(0xFFEF5350)
-
-// Light theme – white background, dark text
-private val LightColorScheme = lightColorScheme(
-    primary = AccentBlue,
-    secondary = AccentGreen,
-    tertiary = AccentRed,
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.Black,
-    onSecondary = Color.Black,
-    onTertiary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    primaryContainer = AccentBlue.copy(alpha = 0.2f),
-    onPrimaryContainer = Color.Black
+// Predefined accent colors
+val accentColors = mapOf(
+    "blue" to Color(0xFF4FC3F7),
+    "green" to Color(0xFF66BB6A),
+    "red" to Color(0xFFEF5350),
+    "purple" to Color(0xFFAB47BC),
+    "orange" to Color(0xFFFFA726),
+    "pink" to Color(0xFFEC407A)
 )
 
-// Standard dark – dark grey background, light text
-private val DarkColorScheme = darkColorScheme(
-    primary = AccentBlue,
-    secondary = AccentGreen,
-    tertiary = AccentRed,
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
-    onPrimary = Color.Black,
-    onSecondary = Color.Black,
-    onTertiary = Color.Black,
-    onBackground = Color.White,
-    onSurface = Color.White,
-    primaryContainer = AccentBlue.copy(alpha = 0.2f),
-    onPrimaryContainer = Color.White
-)
+// Default accent (fallback)
+private val defaultAccent = accentColors["blue"]!!
 
-// AMOLED – pure black background, light text
-private val AmoledColorScheme = darkColorScheme(
-    primary = AccentBlue,
-    secondary = AccentGreen,
-    tertiary = AccentRed,
-    background = Color.Black,
-    surface = Color.Black,
-    onPrimary = Color.Black,
-    onSecondary = Color.Black,
-    onTertiary = Color.Black,
-    onBackground = Color.White,
-    onSurface = Color.White,
-    primaryContainer = AccentBlue.copy(alpha = 0.2f),
-    onPrimaryContainer = Color.White
-)
+// Color schemes – accent color is parameterized
+private fun getColorScheme(
+    accentColor: Color,
+    isDark: Boolean
+): ColorScheme {
+    return if (isDark) {
+        darkColorScheme(
+            primary = accentColor,
+            secondary = accentColor.copy(alpha = 0.7f),
+            tertiary = accentColor.copy(alpha = 0.5f),
+            background = Color.Black,
+            surface = Color(0xFF1A1A1A),
+            onPrimary = Color.Black,
+            onSecondary = Color.Black,
+            onTertiary = Color.Black,
+            onBackground = Color.White,
+            onSurface = Color.White
+        )
+    } else {
+        lightColorScheme(
+            primary = accentColor,
+            secondary = accentColor.copy(alpha = 0.7f),
+            tertiary = accentColor.copy(alpha = 0.5f),
+            background = Color.White,
+            surface = Color.White,
+            onPrimary = Color.Black,
+            onSecondary = Color.Black,
+            onTertiary = Color.Black,
+            onBackground = Color.Black,
+            onSurface = Color.Black
+        )
+    }
+}
 
 enum class ThemeMode {
     LIGHT, DARK, AMOLED, SYSTEM
@@ -72,10 +67,12 @@ enum class ThemeMode {
 fun DroidUtilityTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     useDynamicColor: Boolean = false,
+    accentColorName: String = "blue",
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
     val isDark = isSystemInDarkTheme()
+    val accentColor = accentColors[accentColorName] ?: defaultAccent
 
     val colorScheme = when {
         useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -85,11 +82,14 @@ fun DroidUtilityTheme(
                 dynamicDarkColorScheme(context)
             }
         }
-        themeMode == ThemeMode.LIGHT -> LightColorScheme
-        themeMode == ThemeMode.DARK -> DarkColorScheme
-        themeMode == ThemeMode.AMOLED -> AmoledColorScheme
-        else -> { // SYSTEM
-            if (isDark) DarkColorScheme else LightColorScheme
+        else -> {
+            val dark = when (themeMode) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.AMOLED -> true
+                else -> isDark // SYSTEM
+            }
+            getColorScheme(accentColor, dark)
         }
     }
 
@@ -101,21 +101,9 @@ fun DroidUtilityTheme(
             window.navigationBarColor = colorScheme.background.toArgb()
 
             val controller = WindowCompat.getInsetsController(window, view)
-            // Determine if icons should be light or dark based on theme
-            val isLightTheme = when {
-                themeMode == ThemeMode.LIGHT -> true
-                themeMode == ThemeMode.SYSTEM && !isDark -> true
-                else -> false
-            }
-            // If dynamic color is used, we ignore the above and just set based on the actual color scheme
-            if (useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                // Dynamic color might produce a light or dark scheme; we'll assume it's dark
-                controller.isAppearanceLightStatusBars = false
-                controller.isAppearanceLightNavigationBars = false
-            } else {
-                controller.isAppearanceLightStatusBars = isLightTheme
-                controller.isAppearanceLightNavigationBars = isLightTheme
-            }
+            val isLightTheme = (themeMode == ThemeMode.LIGHT) || (themeMode == ThemeMode.SYSTEM && !isDark)
+            controller.isAppearanceLightStatusBars = isLightTheme
+            controller.isAppearanceLightNavigationBars = isLightTheme
         }
     }
 
