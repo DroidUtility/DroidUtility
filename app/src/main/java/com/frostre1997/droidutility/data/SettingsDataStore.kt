@@ -37,11 +37,11 @@ object SettingsDataStore {
 
     // Defaults
     fun getDefaultThemeMode(): String = "SYSTEM"
+    fun getDefaultAccentColor(): String = "blue"
     fun getDefaultTerminalFontSize(): Float = 16f
     fun getDefaultTerminalFontFamily(): String = "monospace"
     fun getDefaultCustomFontPath(): String = ""
     fun getDefaultBoolean(): Boolean = false
     fun getDefaultLanguage(): String = "en"
     fun getDefaultUIScale(): Float = 1.0f
-    fun getDefaultAccentColor(): String = "blue"
 }
