@@ -8,21 +8,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun DebloatScreen() {
+    val colorScheme = MaterialTheme.colorScheme
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorScheme.background)
+            .background(colorScheme.background)
             .padding(24.dp)
     ) {
         Text(
             text = "Debloat Manager",
             style = MaterialTheme.typography.headlineLarge,
-            color = ColorScheme.onSurface
+            color = colorScheme.onSurface
         )
         // Your debloat UI here
     }
