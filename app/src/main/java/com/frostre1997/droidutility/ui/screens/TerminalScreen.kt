@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -30,7 +29,7 @@ fun TerminalScreen() {
 
     fun executeCommand(command: String) {
         if (command.isBlank()) return
-        outputLines.add("$ ${command}")
+        outputLines.add("> $command")
         coroutineScope.launch {
             val result = ShizukuShellManager.executeCommand(command)
             if (result.success) {
@@ -38,7 +37,6 @@ fun TerminalScreen() {
             } else {
                 outputLines.add("Error: ${result.error}")
             }
-            // Scroll to bottom
             scrollState.animateScrollToItem(outputLines.size - 1)
         }
     }
@@ -49,20 +47,20 @@ fun TerminalScreen() {
             .background(colorScheme.background)
             .padding(16.dp)
     ) {
-        // Output
+        // Output area
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(colorScheme.surface, RoundedCornerShape(8.dp))
-                .padding(8.dp),
+                .padding(12.dp),
             state = scrollState,
             reverseLayout = false
         ) {
             items(outputLines) { line ->
                 Text(
                     text = line,
-                    color = if (line.startsWith("$")) colorScheme.primary else colorScheme.onSurface,
+                    color = if (line.startsWith(">")) colorScheme.primary else colorScheme.onSurface,
                     fontFamily = FontFamily.Monospace,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(vertical = 2.dp)
@@ -71,7 +69,7 @@ fun TerminalScreen() {
             if (outputLines.isEmpty()) {
                 item {
                     Text(
-                        text = "Ready. Enter a command to execute via Shizuku.",
+                        text = "Windows Command Prompt\nType a command and press Send.",
                         color = colorScheme.onSurfaceVariant,
                         fontFamily = FontFamily.Monospace,
                         fontSize = 14.sp
