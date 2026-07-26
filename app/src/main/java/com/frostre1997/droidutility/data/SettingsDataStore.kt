@@ -11,6 +11,7 @@ object SettingsDataStore {
     // Theme
     val THEME_MODE = stringPreferencesKey("theme_mode")
     val USE_DYNAMIC_COLOR = booleanPreferencesKey("use_dynamic_color")
+    val ACCENT_COLOR = stringPreferencesKey("accent_color") // "blue", "green", "red", etc.
 
     // Terminal
     val TERMINAL_FONT_SIZE = floatPreferencesKey("terminal_font_size")
