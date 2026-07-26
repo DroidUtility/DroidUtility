@@ -1,5 +1,8 @@
 package com.frostre1997.droidutility.ui.screens
 
+import androidx.compose.foundation.border
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.ui.graphics.asImageBitmap
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.background
@@ -134,7 +137,7 @@ fun DebloatScreen() {
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Search apps...", color = colorScheme.onSurfaceVariant) },
+            placeholder = { Text("Search...", color = colorScheme.onSurfaceVariant) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = colorScheme.onSurfaceVariant) },
             textStyle = TextStyle(color = colorScheme.onSurface),
             colors = OutlinedTextFieldDefaults.colors(),
