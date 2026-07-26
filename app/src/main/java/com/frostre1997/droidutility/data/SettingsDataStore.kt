@@ -43,4 +43,5 @@ object SettingsDataStore {
     fun getDefaultBoolean(): Boolean = false
     fun getDefaultLanguage(): String = "en"
     fun getDefaultUIScale(): Float = 1.0f
+    fun getDefaultAccentColor(): String = "blue"
 }
