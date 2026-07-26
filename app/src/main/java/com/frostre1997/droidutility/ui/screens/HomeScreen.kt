@@ -1,7 +1,15 @@
 package com.frostre1997.droidutility.ui.screens
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
+import android.os.BatteryManager
+import android.os.Environment
+import android.os.StatFs
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,35 +23,37 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.ShizukuShellManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-// Temporary log data class – replace with your actual LogManager
+// Temporary log data class
 data class LogEntry(val message: String, val timestamp: String, val status: String)
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    bottomPadding: Dp = 80.dp // space for floating bar
+    bottomPadding: Dp = 80.dp
 ) {
     val context = LocalContext.current
     val colorScheme = MaterialTheme.colorScheme
     var showAboutDialog by remember { mutableStateOf(false) }
 
-    // Shizuku state
     var isShizukuRunning by remember { mutableStateOf(false) }
     var isPermissionGranted by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Stats – replace with real data later
     val totalApps = 42
     val debloatedApps = 7
 
-    // Recent logs – replace with real data from LogManager
     val recentLogs = listOf(
         LogEntry("Debloat completed", "10:30", "Success"),
         LogEntry("Terminal command executed", "10:15", "Info"),
@@ -52,16 +62,11 @@ fun HomeScreen(
         LogEntry("Permission granted", "09:00", "Success")
     )
 
-    // Check Shizuku status periodically
     LaunchedEffect(Unit) {
         while (true) {
             isLoading = true
             isShizukuRunning = ShizukuShellManager.checkAvailability()
-            if (isShizukuRunning) {
-                isPermissionGranted = ShizukuShellManager.hasPermission()
-            } else {
-                isPermissionGranted = false
-            }
+            isPermissionGranted = if (isShizukuRunning) ShizukuShellManager.hasPermission() else false
             isLoading = false
             delay(1500)
         }
@@ -81,13 +86,11 @@ fun HomeScreen(
         ),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // --- Summary Section (Core + Stats) ---
         item {
             Row(
                 modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Core status card (Shizuku)
                 CoreStatusCard(
                     isRunning = isShizukuRunning,
                     isPermissionGranted = isPermissionGranted,
@@ -102,7 +105,6 @@ fun HomeScreen(
                     },
                     modifier = Modifier.weight(1f)
                 )
-                // Stats column
                 Column(
                     modifier = Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -121,23 +123,20 @@ fun HomeScreen(
             }
         }
 
-        // --- System Info Card ---
         item {
             SystemInfoCard()
         }
 
-        // --- Permission Health Card ---
         item {
             PermissionHealthCard(
-                missingPermissionCount = 0, // calculate from your actual data
+                missingPermissionCount = 0,
                 onClick = {
-                    // open permission manager
-                    context.startActivity(Intent(context, PermissionActivity::class.java))
+                    // Open a permission screen or just show a toast
+                    context.toast("Permission Health Check")
                 }
             )
         }
 
-        // --- Recent Logs ---
         if (recentLogs.isNotEmpty()) {
             item {
                 SectionCard(
@@ -149,7 +148,6 @@ fun HomeScreen(
             }
         }
 
-        // --- Quick Execute ---
         item {
             SectionCard(
                 title = "Quick Execute"
@@ -162,15 +160,12 @@ fun HomeScreen(
                         "Settings" to Icons.Default.Settings
                     )
                 ) { label ->
-                    // navigate to corresponding tab – you can use the navController from parent
-                    // For now, just show a toast or open activity
                     context.toast("Opening $label")
                 }
             }
         }
     }
 
-    // About dialog
     if (showAboutDialog) {
         AlertDialog(
             onDismissRequest = { showAboutDialog = false },
@@ -295,8 +290,75 @@ fun StatCard(
 }
 
 @Composable
-fun SystemInfoCard() {
-    // Your existing SystemInfoCard implementation – unchanged
+fun SystemInfoCard(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val colorScheme = MaterialTheme.colorScheme
+    var systemInfo by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var refreshKey by remember { mutableStateOf(0) }
+
+    LaunchedEffect(refreshKey) {
+        withContext(Dispatchers.IO) {
+            val memInfo = ActivityManager.MemoryInfo()
+            (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(memInfo)
+            val totalMem = memInfo.totalMem / (1024 * 1024)
+
+            val statFs = StatFs(Environment.getDataDirectory().path)
+            val totalBytes = statFs.totalBytes
+            val freeBytes = statFs.availableBytes
+
+            val batteryIntent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+            val level = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+            val scale = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+            val batteryPct = if (level > 0 && scale > 0) (level * 100 / scale).toString() + "%" else "Unknown"
+
+            val info = buildMap {
+                put("Device", Build.MODEL)
+                put("Manufacturer", Build.MANUFACTURER)
+                put("Android", Build.VERSION.RELEASE)
+                put("API", Build.VERSION.SDK_INT.toString())
+                put("CPU", Build.CPU_ABI)
+                put("RAM (Total)", "$totalMem MB")
+                put("Storage (Total)", "${totalBytes / (1024 * 1024 * 1024)} GB")
+                put("Storage (Free)", "${freeBytes / (1024 * 1024 * 1024)} GB")
+                put("Battery", batteryPct)
+            }
+            systemInfo = info
+            isLoading = false
+        }
+    }
+
+    Surface(
+        color = colorScheme.surface,
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("System Info", color = colorScheme.onSurface, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                IconButton(onClick = { refreshKey++ }) {
+                    Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = colorScheme.primary)
+                }
+            }
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = colorScheme.onSurfaceVariant)
+            } else {
+                systemInfo.forEach { (key, value) ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(key, color = colorScheme.onSurfaceVariant, fontSize = 13.sp)
+                        Text(value, color = colorScheme.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -421,7 +483,7 @@ fun QuickExecuteList(
     }
 }
 
-// Placeholder toast – replace with your actual Toast implementation
+// Extension function for Toast
 fun Context.toast(message: String) {
     android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
 }
