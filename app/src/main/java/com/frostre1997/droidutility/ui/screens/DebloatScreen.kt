@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -50,7 +51,6 @@ fun DebloatScreen() {
     var appList by remember { mutableStateOf<List<AppInfo>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Load apps
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
             val pm = context.packageManager
@@ -75,7 +75,6 @@ fun DebloatScreen() {
         }
     }
 
-    // Filter apps
     val filteredApps = appList.filter { app ->
         val matchesSearch = searchQuery.isBlank() ||
                 app.appName.contains(searchQuery, ignoreCase = true) ||
@@ -100,7 +99,6 @@ fun DebloatScreen() {
             }
             val result = ShizukuShellManager.executeCommand(command)
             if (result.success) {
-                // Reload apps to reflect state change
                 withContext(Dispatchers.IO) {
                     val pm = context.packageManager
                     val installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
@@ -128,7 +126,6 @@ fun DebloatScreen() {
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        // Search bar
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -143,7 +140,6 @@ fun DebloatScreen() {
                 .border(1.dp, colorScheme.onSurfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
         )
 
-        // Filter chips
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -179,7 +175,6 @@ fun DebloatScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // App list
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = colorScheme.primary)
@@ -216,7 +211,6 @@ fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon
             Box(modifier = Modifier.size(40.dp)) {
                 if (app.icon != null) {
                     Image(
@@ -227,7 +221,6 @@ fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
                 }
             }
             Spacer(modifier = Modifier.width(12.dp))
-            // Details
             Column(modifier = Modifier.weight(1f)) {
                 Text(app.appName, color = colorScheme.onSurface, fontWeight = FontWeight.Medium)
                 Text(app.packageName, color = colorScheme.onSurfaceVariant, fontSize = 12.sp)
@@ -249,15 +242,13 @@ fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
                     }
                 }
             }
-            // Expand/collapse indicator
             Icon(
-                if (expanded) Icons.Default.KeyboardArrowRight else Icons.Default.KeyboardArrowRight,
+                Icons.Default.KeyboardArrowRight,
                 contentDescription = null,
                 tint = colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         }
-        // Expanded actions
         if (expanded) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
@@ -282,7 +273,6 @@ fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
     }
 }
 
-// Extension: Drawable → Bitmap
 fun Drawable.toBitmap(): android.graphics.Bitmap {
     val bitmap = android.graphics.Bitmap.createBitmap(
         intrinsicWidth.takeIf { it > 0 } ?: 100,
