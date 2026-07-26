@@ -1,5 +1,6 @@
 package com.frostre1997.droidutility.ui.screens
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -19,6 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.ShizukuShellManager
 import kotlinx.coroutines.delay
+
+// Extension function for Toast
+fun Context.toast(message: String) {
+    android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
+}
 
 @Composable
 fun HomeScreen() {
@@ -56,7 +62,7 @@ fun HomeScreen() {
             .background(colorScheme.background)
             .padding(24.dp)
     ) {
-        // Top row: "Home" + Info icon
+        // Top row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -161,7 +167,7 @@ fun HomeScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Stats: Total Apps + Debloated
+        // Stats
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -196,7 +202,6 @@ fun HomeScreen() {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Recent Activity
         Text("Recent Activity", color = colorScheme.onSurface, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         Card(
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -210,7 +215,6 @@ fun HomeScreen() {
         }
     }
 
-    // About dialog
     if (showAboutDialog) {
         AlertDialog(
             onDismissRequest = { showAboutDialog = false },
@@ -230,9 +234,4 @@ fun HomeScreen() {
             containerColor = colorScheme.surface
         )
     }
-}
-
-// Extension function for toast (if needed elsewhere)
-fun Context.toast(message: String) {
-    android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
 }
