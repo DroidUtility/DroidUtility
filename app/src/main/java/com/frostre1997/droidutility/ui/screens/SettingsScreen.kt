@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +78,12 @@ sealed class SettingsItem {
     data class ThemeRadioGroup(
         val currentTheme: String,
         val onThemeSelected: (String) -> Unit
+    ) : SettingsItem()
+
+    // NEW: Custom accent color picker
+    data class ColorPicker(
+        val selectedColor: String,
+        val onColorSelected: (String) -> Unit
     ) : SettingsItem()
 }
 
@@ -310,6 +317,48 @@ fun ThemeRadioGroup(
     }
 }
 
+// NEW: Custom accent color picker
+@Composable
+fun SettingColorPicker(
+    selectedColor: String,
+    onColorSelected: (String) -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val colors = mapOf(
+        "blue" to Color(0xFF4FC3F7),
+        "green" to Color(0xFF66BB6A),
+        "red" to Color(0xFFEF5350),
+        "purple" to Color(0xFFAB47BC),
+        "orange" to Color(0xFFFFA726),
+        "pink" to Color(0xFFEC407A)
+    )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text("Accent Color", color = colorScheme.onSurface)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            colors.forEach { (name, color) ->
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(color, shape = RoundedCornerShape(50))
+                        .border(
+                            width = if (selectedColor == name) 3.dp else 0.dp,
+                            color = colorScheme.onSurface,
+                            shape = RoundedCornerShape(50)
+                        )
+                        .clickable { onColorSelected(name) }
+                )
+            }
+        }
+    }
+}
+
 // ---------- Main Settings Screen ----------
 @Composable
 fun SettingsScreen() {
@@ -334,6 +383,9 @@ fun SettingsScreen() {
     val colorfulWorkflowCards by settingsManager.getColorfulWorkflowCardsFlow().collectAsState(initial = false)
     val liquidGlassNav by settingsManager.getLiquidGlassNavFlow().collectAsState(initial = false)
     val uiScale by settingsManager.getUIScaleFlow().collectAsState(initial = 1.0f)
+
+    // NEW: Accent color state
+    val accentColor by settingsManager.getAccentColorFlow().collectAsState(initial = "blue")
 
     // File picker for custom font
     val fontPickerLauncher = rememberLauncherForActivityResult(
@@ -389,7 +441,16 @@ fun SettingsScreen() {
                     },
                     SettingsItem.Slider("Scale", uiScale, 0.5f..1.5f) { newScale ->
                         coroutineScope.launch { settingsManager.setUIScale(newScale) }
-                    }
+                    },
+                    // NEW: Custom accent color picker
+                    SettingsItem.ColorPicker(
+                        selectedColor = accentColor,
+                        onColorSelected = { color ->
+                            coroutineScope.launch {
+                                settingsManager.setAccentColor(color)
+                            }
+                        }
+                    )
                 )
             )
         )
@@ -512,6 +573,7 @@ fun SettingsScreen() {
                     is SettingsItem.Label -> item.text.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.Action -> item.label.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.ThemeRadioGroup -> true
+                    is SettingsItem.ColorPicker -> true   // always visible when searching
                     else -> false
                 }
             }
@@ -618,6 +680,12 @@ fun SettingsScreen() {
                                     ThemeRadioGroup(
                                         themeMode = item.currentTheme,
                                         onThemeSelected = item.onThemeSelected
+                                    )
+                                }
+                                is SettingsItem.ColorPicker -> {
+                                    SettingColorPicker(
+                                        selectedColor = item.selectedColor,
+                                        onColorSelected = item.onColorSelected
                                     )
                                 }
                             }
