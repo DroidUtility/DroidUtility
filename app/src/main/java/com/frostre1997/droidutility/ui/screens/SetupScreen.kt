@@ -58,7 +58,7 @@ fun SetupScreen(
     ) {
         // ---- LOGO ----
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground), // replace with your logo
+            painter = painterResource(id = R.drawable.play_store_512), // replace with your logo
             contentDescription = "App Logo",
             modifier = Modifier.size(120.dp)
         )
