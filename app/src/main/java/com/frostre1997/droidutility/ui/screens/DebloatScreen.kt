@@ -122,9 +122,7 @@ fun DebloatScreen() {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorScheme.background)
+        modifier = Modifier.fillMaxSize().background(colorScheme.background)
     ) {
         OutlinedTextField(
             value = searchQuery,
@@ -185,10 +183,7 @@ fun DebloatScreen() {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredApps) { app ->
-                    AppItem(
-                        app = app,
-                        onAction = { action -> performAction(app, action) }
-                    )
+                    AppItem(app = app, onAction = { action -> performAction(app, action) })
                 }
             }
         }
@@ -203,9 +198,7 @@ fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded }
+        modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded }
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -231,8 +224,7 @@ fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
                         }
                     }
                     Badge(
-                        containerColor = if (app.isEnabled) Color.Green.copy(alpha = 0.2f)
-                        else Color.Red.copy(alpha = 0.2f)
+                        containerColor = if (app.isEnabled) Color.Green.copy(alpha = 0.2f) else Color.Red.copy(alpha = 0.2f)
                     ) {
                         Text(
                             if (app.isEnabled) "Enabled" else "Disabled",
@@ -255,18 +247,12 @@ fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
                 horizontalArrangement = Arrangement.End
             ) {
                 if (app.isEnabled) {
-                    TextButton(onClick = { onAction("disable") }) {
-                        Text("Disable", color = Color.Red)
-                    }
+                    TextButton(onClick = { onAction("disable") }) { Text("Disable", color = Color.Red) }
                 } else {
-                    TextButton(onClick = { onAction("enable") }) {
-                        Text("Enable", color = Color.Green)
-                    }
+                    TextButton(onClick = { onAction("enable") }) { Text("Enable", color = Color.Green) }
                 }
                 if (!app.isSystemApp) {
-                    TextButton(onClick = { onAction("uninstall") }) {
-                        Text("Uninstall", color = Color.Red)
-                    }
+                    TextButton(onClick = { onAction("uninstall") }) { Text("Uninstall", color = Color.Red) }
                 }
             }
         }
