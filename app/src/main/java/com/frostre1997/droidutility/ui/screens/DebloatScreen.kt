@@ -1,5 +1,6 @@
 package com.frostre1997.droidutility.ui.screens
 
+import com.frostre1997.droidutility.displayText
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
