@@ -1,5 +1,8 @@
 package com.frostre1997.droidutility.ui.screens
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,11 +10,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -19,89 +27,244 @@ import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.ShizukuShellManager
 import kotlinx.coroutines.launch
 
+// Data class for a terminal line
+data class TerminalLine(
+    val text: String,
+    val isCommand: Boolean // true = command prompt line, false = output
+)
+
 @Composable
 fun TerminalScreen() {
+    val context = LocalContext.current
     val colorScheme = MaterialTheme.colorScheme
     val coroutineScope = rememberCoroutineScope()
     var inputText by remember { mutableStateOf("") }
-    val outputLines = remember { mutableStateListOf<String>() }
+    val outputLines = remember { mutableStateListOf<TerminalLine>() }
     val scrollState = rememberLazyListState()
+
+    // Command history
+    var history by remember { mutableStateOf(listOf<String>()) }
+    var historyIndex by remember { mutableStateOf(-1) }
+
+    // Functions
+    fun scrollToBottom() {
+        coroutineScope.launch {
+            if (outputLines.isNotEmpty()) {
+                scrollState.animateScrollToItem(outputLines.size - 1)
+            }
+        }
+    }
 
     fun executeCommand(command: String) {
         if (command.isBlank()) return
-        outputLines.add("> $command")
+
+        // Add command to output with prompt
+        val prompt = "> "
+        outputLines.add(TerminalLine("$prompt$command", isCommand = true))
+
+        // Add to history
+        history = history + command
+        historyIndex = history.size
+
+        // Execute
         coroutineScope.launch {
             val result = ShizukuShellManager.executeCommand(command)
             if (result.success) {
-                outputLines.add(result.output.ifBlank { "(no output)" })
+                val output = result.output
+                if (output.isNotBlank()) {
+                    outputLines.addAll(output.lines().map { TerminalLine(it, isCommand = false) })
+                } else {
+                    outputLines.add(TerminalLine("(no output)", isCommand = false))
+                }
             } else {
-                outputLines.add("Error: ${result.error}")
+                val error = result.error.ifBlank { "Command failed (exit code: ${result.exitCode})" }
+                outputLines.addAll(error.lines().map { TerminalLine("ERROR: $it", isCommand = false) })
             }
-            scrollState.animateScrollToItem(outputLines.size - 1)
+            // If there is stderr, show it as well
+            if (result.error.isNotBlank() && result.success) {
+                outputLines.addAll(result.error.lines().map { TerminalLine("STDERR: $it", isCommand = false) })
+            }
+            scrollToBottom()
         }
+
+        // Clear input
+        inputText = ""
+        scrollToBottom()
+    }
+
+    fun clearOutput() {
+        outputLines.clear()
+    }
+
+    fun copyAllOutput() {
+        val text = outputLines.joinToString("\n") { it.text }
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("Terminal Output", text)
+        clipboard.setPrimaryClip(clip)
+        context.toast("Copied to clipboard")
+    }
+
+    // Handle arrow keys for history
+    fun handleKeyEvent(event: androidx.compose.ui.input.key.KeyEvent): Boolean {
+        if (event.type == androidx.compose.ui.input.key.KeyEventType.KeyDown) {
+            when (event.key) {
+                Key.ArrowUp -> {
+                    if (historyIndex > 0) {
+                        historyIndex--
+                        inputText = history.getOrElse(historyIndex) { "" }
+                    }
+                    return true
+                }
+                Key.ArrowDown -> {
+                    if (historyIndex < history.size - 1) {
+                        historyIndex++
+                        inputText = history.getOrElse(historyIndex) { "" }
+                    } else {
+                        historyIndex = history.size
+                        inputText = ""
+                    }
+                    return true
+                }
+                Key.Enter -> {
+                    executeCommand(inputText)
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background)
+            .background(Color(0xFF0A0A0A)) // very dark background
             .padding(16.dp)
     ) {
-        LazyColumn(
+        // Top bar: Title + Clear button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Terminal",
+                color = Color(0xFF00FF00), // green like old terminals
+                fontSize = 18.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Row {
+                IconButton(
+                    onClick = { copyAllOutput() },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        Icons.Default.ContentCopy,
+                        contentDescription = "Copy",
+                        tint = Color(0xFF00FF00)
+                    )
+                }
+                IconButton(
+                    onClick = { clearOutput() },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = "Clear",
+                        tint = Color(0xFF00FF00)
+                    )
+                }
+            }
+        }
+
+        // Output area
+        Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .background(colorScheme.surface, RoundedCornerShape(8.dp))
-                .padding(12.dp),
-            state = scrollState
-        ) {
-            items(outputLines) { line ->
-                Text(
-                    text = line,
-                    color = if (line.startsWith(">")) colorScheme.primary else colorScheme.onSurface,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(vertical = 2.dp)
+                .background(Color(0xFF0A0A0A), RoundedCornerShape(8.dp))
+                .combinedClickable(
+                    onClick = { /* ignore */ },
+                    onLongClick = { copyAllOutput() }
                 )
-            }
-            if (outputLines.isEmpty()) {
-                item {
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(8.dp),
+                state = scrollState,
+                reverseLayout = false
+            ) {
+                items(outputLines) { line ->
                     Text(
-                        text = "Ready. Enter a command to execute via Shizuku.",
-                        color = colorScheme.onSurfaceVariant,
+                        text = line.text,
+                        color = if (line.isCommand) Color(0xFF00FF00) else Color(0xFFF0F0F0),
                         fontFamily = FontFamily.Monospace,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(vertical = 1.dp)
                     )
+                }
+                if (outputLines.isEmpty()) {
+                    item {
+                        Text(
+                            text = "Type a command and press Enter.",
+                            color = Color.DarkGray,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Input row
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Prompt
+            Text(
+                text = "> ",
+                color = Color(0xFF00FF00),
+                fontFamily = FontFamily.Monospace,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(end = 4.dp)
+            )
             OutlinedTextField(
                 value = inputText,
                 onValueChange = { inputText = it },
-                placeholder = { Text("Enter command...", color = colorScheme.onSurfaceVariant) },
-                textStyle = TextStyle(color = colorScheme.onSurface, fontFamily = FontFamily.Monospace),
-                colors = OutlinedTextFieldDefaults.colors(),
-                modifier = Modifier.weight(1f),
+                placeholder = { Text("Enter command...", color = Color.DarkGray) },
+                textStyle = TextStyle(
+                    color = Color(0xFFF0F0F0),
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 14.sp
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF00FF00),
+                    unfocusedBorderColor = Color.DarkGray,
+                    cursorColor = Color(0xFF00FF00),
+                    containerColor = Color(0xFF1A1A1A)
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .onKeyEvent { handleKeyEvent(it) },
                 singleLine = true
             )
             IconButton(
-                onClick = {
-                    if (inputText.isNotBlank()) {
-                        executeCommand(inputText)
-                        inputText = ""
-                    }
-                },
+                onClick = { executeCommand(inputText) },
                 modifier = Modifier.padding(start = 8.dp)
             ) {
-                Icon(Icons.Default.Send, contentDescription = "Send", tint = colorScheme.primary)
+                Icon(
+                    Icons.Default.Send,
+                    contentDescription = "Send",
+                    tint = Color(0xFF00FF00)
+                )
             }
         }
     }
+}
+
+// Extension for toast (already in HomeScreen, we'll reuse)
+fun Context.toast(message: String) {
+    android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
 }
