@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.ShizukuShellManager
 import kotlinx.coroutines.delay
 
-// Explicitly import weight extension
+// Explicit import for weight extension
 import androidx.compose.foundation.layout.weight
 
 fun Context.toast(message: String) {
@@ -204,7 +204,7 @@ fun HomeScreen() {
 fun StatCard(title: String, value: String) {
     val colorScheme = MaterialTheme.colorScheme
     Card(
-        modifier = Modifier.weight(1f), // now works with explicit import
+        modifier = Modifier.weight(1f),  // fixed with import
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
