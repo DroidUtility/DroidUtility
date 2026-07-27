@@ -175,7 +175,7 @@ fun HomeScreen() {
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Text("No recent logs", color = colorScheme.onSurfaceVariant, fontSize = 14.sp)
                 Text(
-                    "Run a task or open a tool to see activity here.",
+                    text = "Run a task or open a tool to see activity here.",
                     color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     fontSize = 12.sp
                 )
