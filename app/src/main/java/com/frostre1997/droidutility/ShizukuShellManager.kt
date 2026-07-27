@@ -91,7 +91,6 @@ object ShizukuShellManager {
 
     /**
      * Execute a shell command via Shizuku and return the result.
-     * Works even if Shizuku is not running – returns an error message.
      */
     suspend fun executeCommand(command: String): ShellResult = withContext(Dispatchers.IO) {
         if (!checkAvailability()) {
@@ -102,7 +101,6 @@ object ShizukuShellManager {
         }
 
         return@withContext runCatching {
-            // Use Shizuku's shell to run the command
             val shell = Shizuku.newShell(arrayOf("sh", "-c", command))
             val result = shell.waitFor()
             val stdout = StringBuilder()
