@@ -24,10 +24,6 @@ import kotlinx.coroutines.delay
 // Explicit import for weight
 import androidx.compose.foundation.layout.weight
 
-fun Context.toast(message: String) {
-    android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
-}
-
 @Composable
 fun HomeScreen() {
     val context = LocalContext.current
