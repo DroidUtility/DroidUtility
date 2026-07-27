@@ -1,4 +1,4 @@
-![description](https://github.com/frostre1997/DroidUtility/blob/main/app/src/main/res/play_store_512.png)
+![description](https://github.com/frostre1997/DroidUtility/blob/main/app/src/main/res/drawable/play_store_512.png)
 
 # DroidUtility
 
