@@ -192,7 +192,7 @@ fun HomeScreen() {
                     Text("Version 1.0.5-beta.6", color = colorScheme.onSurface)
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "A powerful non-root utility suite for Android. Built with love using Jetpack Compose.",
+                        text = "A powerful non-root utility suite for Android. Built with 🤍 using Jetpack Compose.",
                         color = colorScheme.onSurfaceVariant
                     )
                 }
