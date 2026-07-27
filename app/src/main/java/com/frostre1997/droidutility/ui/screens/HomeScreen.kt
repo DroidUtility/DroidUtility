@@ -140,7 +140,12 @@ fun HomeScreen() {
                             Button(
                                 onClick = {
                                     try {
-                                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://shizuku.rikka.app/")))
+                                        context.startActivity(
+                                            Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse("https://shizuku.rikka.app/")
+                                            )
+                                        )
                                     } catch (_: Exception) { /* fallback */ }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
@@ -176,7 +181,11 @@ fun HomeScreen() {
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Text("No recent logs", color = colorScheme.onSurfaceVariant, fontSize = 14.sp)
-                Text("Run a task or open a tool to see activity here.", color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f), fontSize = 12.sp)
+                Text(
+                    "Run a task or open a tool to see activity here.",
+                    color = colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    fontSize = 12.sp
+                )
             }
         }
     }
@@ -189,7 +198,11 @@ fun HomeScreen() {
                 Column {
                     Text("Version 1.0.5-beta.6", color = colorScheme.onSurface)
                     Spacer(Modifier.height(8.dp))
-                    Text("A powerful non‑root utility suite for Android.\nBuilt with 🤍 using Jetpack Compose.", color = colorScheme.onSurfaceVariant)
+                    Text(
+                        "A powerful non‑root utility suite for Android.
+Built with 🤍 using Jetpack Compose.",
+                        color = colorScheme.onSurfaceVariant
+                    )
                 }
             },
             confirmButton = {
