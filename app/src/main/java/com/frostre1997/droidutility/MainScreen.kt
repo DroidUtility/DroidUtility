@@ -1,11 +1,9 @@
 package com.frostre1997.droidutility
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,7 +21,7 @@ fun MainScreen(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route ?: Screen.Home.route
 
-    // Read Liquid Glass setting – default to true so bar is shown
+    // Liquid Glass setting – default to true so bar is visible
     val liquidGlassEnabled by settingsManager.getLiquidGlassNavFlow().collectAsState(initial = true)
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -41,7 +39,7 @@ fun MainScreen(
             composable(Screen.Settings.route) { SettingsScreen() }
         }
 
-        // Only show floating bar if enabled
+        // Show floating bar only if enabled
         if (liquidGlassEnabled) {
             Box(
                 modifier = Modifier
