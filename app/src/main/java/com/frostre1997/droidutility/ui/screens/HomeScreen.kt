@@ -21,9 +21,6 @@ import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.ShizukuShellManager
 import kotlinx.coroutines.delay
 
-// Explicit import for weight
-import androidx.compose.foundation.layout.weight
-
 @Composable
 fun HomeScreen() {
     val context = LocalContext.current
@@ -75,7 +72,7 @@ fun HomeScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "DroidUtility – non‑root tool suite",
+            text = "DroidUtility – non-root tool suite",
             color = colorScheme.onSurfaceVariant,
             fontSize = 14.sp,
             modifier = Modifier.padding(bottom = 24.dp)
@@ -195,7 +192,7 @@ fun HomeScreen() {
                     Text("Version 1.0.5-beta.6", color = colorScheme.onSurface)
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "A powerful non‑root utility suite for Android. Built with 🤍 using Jetpack Compose.",
+                        text = "A powerful non-root utility suite for Android. Built with love using Jetpack Compose.",
                         color = colorScheme.onSurfaceVariant
                     )
                 }
@@ -214,7 +211,7 @@ fun StatCard(title: String, value: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .weight(1f),   // now works with import
+            .weight(1f),
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
