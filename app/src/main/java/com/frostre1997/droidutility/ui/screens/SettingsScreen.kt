@@ -80,7 +80,6 @@ sealed class SettingsItem {
         val onThemeSelected: (String) -> Unit
     ) : SettingsItem()
 
-    // NEW: Custom accent color picker
     data class ColorPicker(
         val selectedColor: String,
         val onColorSelected: (String) -> Unit
@@ -317,7 +316,6 @@ fun ThemeRadioGroup(
     }
 }
 
-// NEW: Custom accent color picker
 @Composable
 fun SettingColorPicker(
     selectedColor: String,
@@ -368,7 +366,7 @@ fun SettingsScreen() {
     var searchQuery by remember { mutableStateOf("") }
     val colorScheme = MaterialTheme.colorScheme
 
-    // Collect all states
+    // Collect states
     val themeMode by settingsManager.getThemeModeFlow().collectAsState(initial = "SYSTEM")
     val dynamicColor by settingsManager.getDynamicColorFlow().collectAsState(initial = false)
     val terminalFontSize by settingsManager.getTerminalFontSizeFlow().collectAsState(initial = 16f)
@@ -381,13 +379,10 @@ fun SettingsScreen() {
     val enableCrashReports by settingsManager.getEnableCrashReportsFlow().collectAsState(initial = false)
     val language by settingsManager.getLanguageFlow().collectAsState(initial = "en")
     val colorfulWorkflowCards by settingsManager.getColorfulWorkflowCardsFlow().collectAsState(initial = false)
-    val liquidGlassNav by settingsManager.getLiquidGlassNavFlow().collectAsState(initial = false)
     val uiScale by settingsManager.getUIScaleFlow().collectAsState(initial = 1.0f)
-
-    // NEW: Accent color state
     val accentColor by settingsManager.getAccentColorFlow().collectAsState(initial = "blue")
 
-    // File picker for custom font
+    // File picker
     val fontPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -398,7 +393,7 @@ fun SettingsScreen() {
         }
     }
 
-    // Build groups
+    // Build groups – no Liquid Glass toggle
     val groups = buildList {
         // Language
         add(
@@ -419,7 +414,7 @@ fun SettingsScreen() {
             )
         )
 
-        // Appearance
+        // Appearance – no Liquid Glass
         add(
             SettingsGroup(
                 title = "Appearance",
@@ -439,7 +434,6 @@ fun SettingsScreen() {
                     SettingsItem.Slider("Scale", uiScale, 0.5f..1.5f) { newScale ->
                         coroutineScope.launch { settingsManager.setUIScale(newScale) }
                     },
-                    // NEW: Custom accent color picker
                     SettingsItem.ColorPicker(
                         selectedColor = accentColor,
                         onColorSelected = { color ->
@@ -555,7 +549,7 @@ fun SettingsScreen() {
         )
     }
 
-    // Filter groups based on search
+    // Filter groups
     val filteredGroups = if (searchQuery.isBlank()) {
         groups
     } else {
@@ -570,7 +564,7 @@ fun SettingsScreen() {
                     is SettingsItem.Label -> item.text.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.Action -> item.label.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.ThemeRadioGroup -> true
-                    is SettingsItem.ColorPicker -> true   // always visible when searching
+                    is SettingsItem.ColorPicker -> true
                     else -> false
                 }
             }
@@ -600,7 +594,6 @@ fun SettingsScreen() {
                 .border(1.dp, colorScheme.onSurfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
         )
 
-        // Settings list with cards
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -613,7 +606,6 @@ fun SettingsScreen() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column {
-                        // Group title
                         Text(
                             text = group.title,
                             color = colorScheme.primary,
@@ -624,7 +616,6 @@ fun SettingsScreen() {
                                 .padding(horizontal = 16.dp, vertical = 12.dp)
                         )
 
-                        // Items
                         group.items.forEachIndexed { index, item ->
                             when (item) {
                                 is SettingsItem.Switch -> {
@@ -686,7 +677,6 @@ fun SettingsScreen() {
                                     )
                                 }
                             }
-                            // Divider between items
                             if (index < group.items.size - 1) {
                                 Divider(
                                     color = colorScheme.onSurfaceVariant.copy(alpha = 0.2f),
