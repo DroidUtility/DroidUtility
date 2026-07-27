@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -91,7 +92,7 @@ fun TerminalScreen() {
         context.toast("Copied to clipboard")
     }
 
-    fun handleKeyEvent(event: androidx.compose.ui.input.key.KeyEvent): Boolean {
+    fun handleKeyEvent(event: KeyEvent): Boolean {
         if (event.type == KeyEventType.KeyDown) {
             when (event.key) {
                 Key.ArrowUp -> {
