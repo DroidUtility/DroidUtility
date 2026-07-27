@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
@@ -86,43 +85,23 @@ fun TerminalScreen() {
         scrollToBottom()
     }
 
-    fun clearOutput() { outputLines.clear() }
+    fun clearOutput() {
+        outputLines.clear()
+    }
 
     fun copyAllOutput() {
         val text = outputLines.joinToString("
 ") { it.text }
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Terminal Output", text)
-        clipboard.setPrimaryClip(clip)
+        cm.setPrimaryClip(clip)
         context.toast("Copied to clipboard")
     }
 
     fun handleKeyEvent(event: KeyEvent): Boolean {
-        if (event.keyEventType == KeyEventType.KeyDown) {
-            when (event.key) {
-                Key.DirectionUp -> {
-                    if (historyIndex > 0) {
-                        historyIndex--
-                        inputText = history.getOrElse(historyIndex) { "" }
-                    }
-                    return true
-                }
-                Key.DirectionDown -> {
-                    if (historyIndex < history.size - 1) {
-                        historyIndex++
-                        inputText = history.getOrElse(historyIndex) { "" }
-                    } else {
-                        historyIndex = history.size
-                        inputText = ""
-                    }
-                    return true
-                }
-                Key.Enter -> {
-                    executeCommand(inputText)
-                    return true
-                }
-                else -> {}
-            }
+        if (event.key == Key.Enter) {
+            executeCommand(inputText)
+            return true
         }
         return false
     }
