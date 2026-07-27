@@ -5,7 +5,6 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
-import rikka.shizuku.shell.Shell   // now resolves
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -89,43 +88,56 @@ object ShizukuShellManager {
     }
 
     /**
-     * Execute a shell command via Shizuku's official shell API.
-     * This uses the `shell` artifact and gives you full stdout/stderr/exit code.
+     * Execute a shell command using `rish` (Shizuku's built‑in shell).
+     * If `rish` is not available, falls back to `sh` (no root/ADB).
      */
     suspend fun executeCommand(command: String): ShellResult = withContext(Dispatchers.IO) {
-        if (!checkAvailability()) {
-            return@withContext ShellResult(false, "", "Shizuku is not available. Please start Shizuku first.", -1)
-        }
-        if (!hasPermission()) {
-            return@withContext ShellResult(false, "", "Shizuku permission not granted. Please grant permission.", -1)
+        if (!checkAvailability() || !hasPermission()) {
+            // No Shizuku – fallback to `sh` (app UID only)
+            return@withContext runCatching {
+                val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
+                val exitCode = process.waitFor()
+                val stdout = process.inputStream.bufferedReader().readText()
+                val stderr = process.errorStream.bufferedReader().readText()
+                ShellResult(
+                    success = exitCode == 0,
+                    output = stdout.trimEnd(),
+                    error = stderr.trimEnd(),
+                    exitCode = exitCode
+                )
+            }.getOrElse { e ->
+                ShellResult(false, "", "Exception: ${e.message}", -1)
+            }
         }
 
+        // Try `rish` first
         return@withContext runCatching {
-            val shell = Shizuku.newShell(arrayOf("sh", "-c", command))
-            val exitCode = shell.waitFor()
-            val stdout = StringBuilder()
-            val stderr = StringBuilder()
-
-            shell.getStdout()?.use { input ->
-                BufferedReader(InputStreamReader(input)).useLines { lines ->
-                    lines.forEach { stdout.appendLine(it) }
-                }
-            }
-            shell.getStderr()?.use { input ->
-                BufferedReader(InputStreamReader(input)).useLines { lines ->
-                    lines.forEach { stderr.appendLine(it) }
-                }
-            }
-            shell.close()
-
+            val process = Runtime.getRuntime().exec(arrayOf("/data/local/tmp/rish", "-c", command))
+            val exitCode = process.waitFor()
+            val stdout = process.inputStream.bufferedReader().readText()
+            val stderr = process.errorStream.bufferedReader().readText()
             ShellResult(
                 success = exitCode == 0,
-                output = stdout.toString().trimEnd(),
-                error = stderr.toString().trimEnd(),
+                output = stdout.trimEnd(),
+                error = stderr.trimEnd(),
                 exitCode = exitCode
             )
-        }.getOrElse { e ->
-            ShellResult(false, "", "Exception: ${e.message}", -1)
+        }.getOrElse { rishError ->
+            // `rish` failed – fallback to `sh`
+            runCatching {
+                val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
+                val exitCode = process.waitFor()
+                val stdout = process.inputStream.bufferedReader().readText()
+                val stderr = process.errorStream.bufferedReader().readText()
+                ShellResult(
+                    success = exitCode == 0,
+                    output = stdout.trimEnd(),
+                    error = stderr.trimEnd(),
+                    exitCode = exitCode
+                )
+            }.getOrElse { shError ->
+                ShellResult(false, "", "rish: ${rishError.message}, sh: ${shError.message}", -1)
+            }
         }
     }
 
