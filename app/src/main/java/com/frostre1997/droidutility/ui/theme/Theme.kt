@@ -28,33 +28,47 @@ private val defaultAccent = accentColors["blue"]!!
 // Color schemes – accent color is parameterized
 private fun getColorScheme(
     accentColor: Color,
-    isDark: Boolean
+    isDark: Boolean,
+    isAmoled: Boolean = false
 ): ColorScheme {
-    return if (isDark) {
+    val background = when {
+        isAmoled -> Color.Black
+        isDark -> Color(0xFF121212)
+        else -> Color.White
+    }
+    val surface = when {
+        isAmoled -> Color.Black
+        isDark -> Color(0xFF1E1E1E)
+        else -> Color.White
+    }
+    val onBackground = if (isDark || isAmoled) Color.White else Color.Black
+    val onSurface = if (isDark || isAmoled) Color.White else Color.Black
+
+    return if (isDark || isAmoled) {
         darkColorScheme(
             primary = accentColor,
             secondary = accentColor.copy(alpha = 0.7f),
             tertiary = accentColor.copy(alpha = 0.5f),
-            background = Color.Black,
-            surface = Color(0xFF1A1A1A),
+            background = background,
+            surface = surface,
             onPrimary = Color.Black,
             onSecondary = Color.Black,
             onTertiary = Color.Black,
-            onBackground = Color.White,
-            onSurface = Color.White
+            onBackground = onBackground,
+            onSurface = onSurface
         )
     } else {
         lightColorScheme(
             primary = accentColor,
             secondary = accentColor.copy(alpha = 0.7f),
             tertiary = accentColor.copy(alpha = 0.5f),
-            background = Color.White,
-            surface = Color.White,
+            background = background,
+            surface = surface,
             onPrimary = Color.Black,
             onSecondary = Color.Black,
             onTertiary = Color.Black,
-            onBackground = Color.Black,
-            onSurface = Color.Black
+            onBackground = onBackground,
+            onSurface = onSurface
         )
     }
 }
@@ -89,7 +103,8 @@ fun DroidUtilityTheme(
                 ThemeMode.AMOLED -> true
                 else -> isDark // SYSTEM
             }
-            getColorScheme(accentColor, dark)
+            val amoled = themeMode == ThemeMode.AMOLED
+            getColorScheme(accentColor, dark, amoled)
         }
     }
 
