@@ -209,9 +209,7 @@ fun HomeScreen() {
 fun StatCard(title: String, value: String) {
     val colorScheme = MaterialTheme.colorScheme
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
