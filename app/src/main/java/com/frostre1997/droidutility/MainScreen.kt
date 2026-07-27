@@ -11,14 +11,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.frostre1997.droidutility.data.SettingsManager
 import com.frostre1997.droidutility.navigation.FloatingBottomBar
 import com.frostre1997.droidutility.ui.screens.*
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    settingsManager: SettingsManager
+) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route ?: Screen.Home.route
+
+    // Read Liquid Glass setting
+    val liquidGlassEnabled by settingsManager.getLiquidGlassNavFlow().collectAsState(initial = false)
 
     Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
@@ -26,7 +32,7 @@ fun MainScreen() {
             startDestination = Screen.Home.route,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 80.dp)
+                .padding(bottom = if (liquidGlassEnabled) 80.dp else 0.dp)
         ) {
             composable(Screen.Home.route) { HomeScreen() }
             composable(Screen.Terminal.route) { TerminalScreen() }
@@ -35,23 +41,26 @@ fun MainScreen() {
             composable(Screen.Settings.route) { SettingsScreen() }
         }
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
-        ) {
-            FloatingBottomBar(
-                currentRoute = currentRoute,
-                onItemClick = { route ->
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+        // Only show floating bar if enabled
+        if (liquidGlassEnabled) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+            ) {
+                FloatingBottomBar(
+                    currentRoute = currentRoute,
+                    onItemClick = { route ->
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
