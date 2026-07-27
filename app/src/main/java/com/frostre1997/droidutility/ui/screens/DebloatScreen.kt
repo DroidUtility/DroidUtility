@@ -124,6 +124,7 @@ fun DebloatScreen() {
     Column(
         modifier = Modifier.fillMaxSize().background(colorScheme.background)
     ) {
+        // Search bar – fixed (no named color parameters)
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -136,16 +137,12 @@ fun DebloatScreen() {
             leadingIcon = { 
                 Icon(
                     Icons.Default.Search, 
-                    contentDescription = null, tint = colorScheme.onSurfaceVariant
+                    contentDescription = null, 
+                    tint = colorScheme.onSurfaceVariant
                 ) 
             },
             textStyle = TextStyle(color = colorScheme.onSurface),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorScheme.primary,
-                unfocusedBorderColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                cursorColor = colorScheme.primary,
-                containerColor = colorScheme.surface
-            ),
+            colors = OutlinedTextFieldDefaults.colors(), // no arguments – uses theme defaults
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -153,7 +150,8 @@ fun DebloatScreen() {
                 .border(
                     1.dp, 
                     colorScheme.onSurfaceVariant.copy(alpha = 0.3f), 
-                    RoundedCornerShape(16.dp))
+                    RoundedCornerShape(16.dp)
+                )
         )
 
         Row(
