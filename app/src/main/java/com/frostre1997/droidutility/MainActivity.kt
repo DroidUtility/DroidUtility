@@ -39,7 +39,6 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.SYSTEM
             }
 
-            // Apply UI scale via custom Density
             val density = LocalDensity.current
             val scaledDensity = Density(
                 density = density.density * uiScale,
