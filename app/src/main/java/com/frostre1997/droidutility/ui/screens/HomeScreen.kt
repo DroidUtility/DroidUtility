@@ -82,7 +82,6 @@ fun HomeScreen() {
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // Shizuku card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
@@ -202,12 +201,15 @@ fun HomeScreen() {
 fun StatCard(title: String, value: String) {
     val colorScheme = MaterialTheme.colorScheme
     Card(
-        modifier = Modifier.weight(1f),
+        modifier = Modifier
+            .weight(1f),   // ← corrected: weight is an extension on Modifier
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(title, color = colorScheme.onSurfaceVariant, fontSize = 14.sp)
