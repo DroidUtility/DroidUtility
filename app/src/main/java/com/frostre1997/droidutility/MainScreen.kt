@@ -23,8 +23,8 @@ fun MainScreen(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route ?: Screen.Home.route
 
-    // Read Liquid Glass setting
-    val liquidGlassEnabled by settingsManager.getLiquidGlassNavFlow().collectAsState(initial = false)
+    // Read Liquid Glass setting – default to true so bar is shown
+    val liquidGlassEnabled by settingsManager.getLiquidGlassNavFlow().collectAsState(initial = true)
 
     Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
