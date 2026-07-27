@@ -436,9 +436,6 @@ fun SettingsScreen() {
                     SettingsItem.Switch("Colorful workflow cards (Beta)", colorfulWorkflowCards) {
                         coroutineScope.launch { settingsManager.setColorfulWorkflowCards(it) }
                     },
-                    SettingsItem.Switch("Liquid Glass navigation bar", liquidGlassNav) {
-                        coroutineScope.launch { settingsManager.setLiquidGlassNav(it) }
-                    },
                     SettingsItem.Slider("Scale", uiScale, 0.5f..1.5f) { newScale ->
                         coroutineScope.launch { settingsManager.setUIScale(newScale) }
                     },
