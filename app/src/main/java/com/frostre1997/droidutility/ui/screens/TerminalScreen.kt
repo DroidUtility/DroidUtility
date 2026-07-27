@@ -47,15 +47,13 @@ fun TerminalScreen() {
             .background(colorScheme.background)
             .padding(16.dp)
     ) {
-        // Output area
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(colorScheme.surface, RoundedCornerShape(8.dp))
                 .padding(12.dp),
-            state = scrollState,
-            reverseLayout = false
+            state = scrollState
         ) {
             items(outputLines) { line ->
                 Text(
@@ -69,7 +67,7 @@ fun TerminalScreen() {
             if (outputLines.isEmpty()) {
                 item {
                     Text(
-                        text = "Windows Command Prompt\nType a command and press Send.",
+                        text = "Ready. Enter a command to execute via Shizuku.",
                         color = colorScheme.onSurfaceVariant,
                         fontFamily = FontFamily.Monospace,
                         fontSize = 14.sp
@@ -80,7 +78,6 @@ fun TerminalScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Input row
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
