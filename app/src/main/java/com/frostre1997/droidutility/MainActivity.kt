@@ -3,19 +3,27 @@ package com.frostre1997.droidutility
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import com.frostre1997.droidutility.data.SettingsManager
 import com.frostre1997.droidutility.ui.screens.SetupScreen
 import com.frostre1997.droidutility.ui.theme.DroidUtilityTheme
 import com.frostre1997.droidutility.ui.theme.ThemeMode
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +34,6 @@ class MainActivity : ComponentActivity() {
         settingsManager = SettingsManager(this)
 
         setContent {
-            // Collect settings
             val themeModeFlow = settingsManager.getThemeModeFlow().collectAsState(initial = "SYSTEM")
             val dynamicColorFlow = settingsManager.getDynamicColorFlow().collectAsState(initial = false)
             val accentColorFlow = settingsManager.getAccentColorFlow().collectAsState(initial = "blue")
@@ -45,36 +52,83 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.SYSTEM
             }
 
-            // UI scale
             val density = LocalDensity.current
-            val scaledDensity = Density(
+            val scaledDensity = androidx.compose.ui.unit.Density(
                 density = density.density * uiScale,
                 fontScale = density.fontScale * uiScale
             )
+
+            var showSplash by remember { mutableStateOf(true) }
+
+            LaunchedEffect(Unit) {
+                delay(1500)
+                showSplash = false
+            }
 
             DroidUtilityTheme(
                 themeMode = mode,
                 useDynamicColor = useDynamicColor,
                 accentColorName = accentColor
             ) {
-                CompositionLocalProvider(LocalDensity provides scaledDensity) {
-                    if (!setupComplete) {
-                        // First launch – show Setup screen
-                        SetupScreen(
-                            onSetupComplete = {
-                                lifecycleScope.launch {
-                                    settingsManager.setSetupComplete(true)
-                                }
-                            }
-                        )
+                androidx.compose.runtime.CompositionLocalProvider(
+                    androidx.compose.ui.platform.LocalDensity provides scaledDensity
+                ) {
+                    if (showSplash) {
+                        SplashScreen()
                     } else {
-                        // Normal flow
-                        Surface(modifier = Modifier.fillMaxSize()) {
-                            MainScreen()
+                        if (!setupComplete) {
+                            SetupScreen(
+                                onSetupComplete = {
+                                    lifecycleScope.launch {
+                                        settingsManager.setSetupComplete(true)
+                                    }
+                                }
+                            )
+                        } else {
+                            Surface(modifier = Modifier.fillMaxSize()) {
+                                MainScreen()
+                            }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun SplashScreen() {
+    val colorScheme = MaterialTheme.colorScheme
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorScheme.background),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Using your monochrome icon
+        Image(
+            painter = painterResource(id = R.mipmap.ic_launcher_monochrome),
+            contentDescription = "App Logo",
+            modifier = Modifier.size(120.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "DroidUtility",
+            style = MaterialTheme.typography.headlineLarge,
+            color = colorScheme.onSurface,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "v1.0.5-beta.6",
+            color = colorScheme.onSurfaceVariant,
+            fontSize = 14.sp
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        CircularProgressIndicator(
+            color = colorScheme.primary,
+            modifier = Modifier.size(32.dp)
+        )
     }
 }
