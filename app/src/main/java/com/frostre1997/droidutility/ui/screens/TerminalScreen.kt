@@ -89,8 +89,7 @@ fun TerminalScreen() {
     fun clearOutput() { outputLines.clear() }
 
     fun copyAllOutput() {
-        val text = outputLines.joinToString("
-") { it.text }
+        val text = outputLines.joinToString("") { it.text }
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Terminal Output", text)
         clipboard.setPrimaryClip(clip)
