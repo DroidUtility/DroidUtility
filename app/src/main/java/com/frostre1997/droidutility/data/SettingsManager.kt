@@ -126,4 +126,15 @@ class SettingsManager(private val context: Context) {
     suspend fun setUIScale(scale: Float) {
         context.dataStore.edit { prefs -> prefs[SettingsDataStore.UI_SCALE] = scale }
     }
+
+    // === Setup ===
+    fun getSetupCompleteFlow(): Flow<Boolean> =
+        context.dataStore.data.map { prefs ->
+            prefs[SettingsDataStore.IS_SETUP_COMPLETE] ?: SettingsDataStore.getDefaultSetupComplete()
+        }
+    suspend fun setSetupComplete(complete: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[SettingsDataStore.IS_SETUP_COMPLETE] = complete
+        }
+    }
 }
