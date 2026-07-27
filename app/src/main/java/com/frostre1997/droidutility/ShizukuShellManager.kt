@@ -5,7 +5,6 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
-import rikka.shizuku.shell.Shell
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -90,39 +89,21 @@ object ShizukuShellManager {
     }
 
     /**
-     * Execute a shell command via Shizuku and return the result.
+     * Execute a command using Runtime.exec() (fallback).
+     * If Shizuku is available and permission is granted, we could use it,
+     * but the shell package is missing in this version.
      */
     suspend fun executeCommand(command: String): ShellResult = withContext(Dispatchers.IO) {
-        if (!checkAvailability()) {
-            return@withContext ShellResult(false, "", "Shizuku is not available. Please start Shizuku first.", -1)
-        }
-        if (!hasPermission()) {
-            return@withContext ShellResult(false, "", "Shizuku permission not granted. Please grant permission.", -1)
-        }
-
         return@withContext runCatching {
-            val shell = Shizuku.newShell(arrayOf("sh", "-c", command))
-            val result = shell.waitFor()
-            val stdout = StringBuilder()
-            val stderr = StringBuilder()
-
-            shell.getStdout()?.use { input ->
-                BufferedReader(InputStreamReader(input)).useLines { lines ->
-                    lines.forEach { stdout.appendLine(it) }
-                }
-            }
-            shell.getStderr()?.use { input ->
-                BufferedReader(InputStreamReader(input)).useLines { lines ->
-                    lines.forEach { stderr.appendLine(it) }
-                }
-            }
-            shell.close()
-
+            val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
+            val exitCode = process.waitFor()
+            val stdout = process.inputStream.bufferedReader().readText()
+            val stderr = process.errorStream.bufferedReader().readText()
             ShellResult(
-                success = result == 0,
-                output = stdout.toString().trimEnd(),
-                error = stderr.toString().trimEnd(),
-                exitCode = result
+                success = exitCode == 0,
+                output = stdout.trimEnd(),
+                error = stderr.trimEnd(),
+                exitCode = exitCode
             )
         }.getOrElse { e ->
             ShellResult(false, "", "Exception: ${e.message}", -1)
@@ -133,30 +114,10 @@ object ShizukuShellManager {
         return commands.map { executeCommand(it) }
     }
 
-    @Deprecated("Persistent shell is not supported; use executeCommand() instead.")
-    fun startPersistentShell(): Nothing? = null
-
-    @Deprecated("Persistent shell is not supported; use executeCommand() instead.")
-    fun writeCommand(process: Any, command: String) {}
-
     data class ShellResult(
         val success: Boolean,
         val output: String,
         val error: String,
         val exitCode: Int
     )
-}
-
-fun ShizukuShellManager.ShellResult.displayText(): String = buildString {
-    appendLine("Exit code: $exitCode")
-    appendLine()
-    if (output.isNotBlank()) {
-        appendLine("--- STDOUT ---")
-        appendLine(output)
-    }
-    if (error.isNotBlank()) {
-        appendLine("--- STDERR ---")
-        appendLine(error)
-    }
-    if (output.isBlank() && error.isBlank()) append("(no output)")
 }
