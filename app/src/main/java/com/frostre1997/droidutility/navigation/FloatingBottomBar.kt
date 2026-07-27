@@ -30,49 +30,54 @@ fun FloatingBottomBar(
         Screen.Settings
     )
 
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(72.dp)
-            .padding(horizontal = 16.dp)
-            .blur(16.dp), // blur effect – works on Android 12+, falls back gracefully
-        color = colorScheme.surface.copy(alpha = 0.5f),
-        shape = RoundedCornerShape(36.dp),
-        shadowElevation = 12.dp,
-        tonalElevation = 0.dp,
-        border = androidx.compose.foundation.BorderStroke(
-            width = 1.dp,
-            color = Color.White.copy(alpha = 0.15f)
-        )
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.BottomCenter
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+        Surface(
+            modifier = Modifier
+                .widthIn(max = 420.dp)
+                .height(68.dp)
+                .padding(horizontal = 4.dp)
+                .blur(16.dp),
+            color = colorScheme.surface.copy(alpha = 0.55f),
+            shape = RoundedCornerShape(34.dp),
+            shadowElevation = 10.dp,
+            tonalElevation = 0.dp,
+            border = androidx.compose.foundation.BorderStroke(
+                width = 1.dp,
+                color = Color.White.copy(alpha = 0.15f)
+            )
         ) {
-            screens.forEach { screen ->
-                val selected = currentRoute == screen.route
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clickable { onItemClick(screen.route) }
-                ) {
-                    Icon(
-                        screen.icon,
-                        contentDescription = screen.title,
-                        tint = if (selected) colorScheme.primary else colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Text(
-                        screen.title,
-                        fontSize = 12.sp,
-                        color = if (selected) colorScheme.primary else colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                screens.forEach { screen ->
+                    val selected = currentRoute == screen.route
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clickable { onItemClick(screen.route) }
+                    ) {
+                        Icon(
+                            screen.icon,
+                            contentDescription = screen.title,
+                            tint = if (selected) colorScheme.primary else colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(26.dp)
+                        )
+                        Text(
+                            screen.title,
+                            fontSize = 11.sp,
+                            color = if (selected) colorScheme.primary else colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            modifier = Modifier.padding(top = 3.dp)
+                        )
+                    }
                 }
             }
         }
