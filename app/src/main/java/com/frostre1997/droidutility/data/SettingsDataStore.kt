@@ -34,6 +34,9 @@ object SettingsDataStore {
     val COLORFUL_WORKFLOW_CARDS = booleanPreferencesKey("colorful_workflow_cards")
     val UI_SCALE = floatPreferencesKey("ui_scale")
 
+    // Setup
+    val IS_SETUP_COMPLETE = booleanPreferencesKey("is_setup_complete")
+
     // Defaults
     fun getDefaultThemeMode(): String = "SYSTEM"
     fun getDefaultAccentColor(): String = "blue"
@@ -43,4 +46,5 @@ object SettingsDataStore {
     fun getDefaultBoolean(): Boolean = false
     fun getDefaultLanguage(): String = "en"
     fun getDefaultUIScale(): Float = 1.0f
+    fun getDefaultSetupComplete(): Boolean = false
 }
