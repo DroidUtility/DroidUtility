@@ -33,6 +33,10 @@ import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.ShizukuShellManager
 import kotlinx.coroutines.launch
 
+fun Context.toast(message: String) {
+    android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
+}
+
 data class TerminalLine(val text: String, val isCommand: Boolean)
 
 @Composable
@@ -85,7 +89,8 @@ fun TerminalScreen() {
     fun clearOutput() { outputLines.clear() }
 
     fun copyAllOutput() {
-        val text = outputLines.joinToString("\n") { it.text }
+        val text = outputLines.joinToString("
+") { it.text }
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Terminal Output", text)
         clipboard.setPrimaryClip(clip)
@@ -227,4 +232,4 @@ fun TerminalScreen() {
             }
         }
     }
-}
+                                            }
