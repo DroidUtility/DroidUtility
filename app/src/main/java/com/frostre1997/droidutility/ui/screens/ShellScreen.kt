@@ -44,13 +44,12 @@ fun ShellScreen() {
             .padding(16.dp)
     ) {
         Text(
-            text = "Shell (Windows CMD)",
+            text = "Shell",
             style = MaterialTheme.typography.headlineMedium,
             color = colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Output box
         Surface(
             color = colorScheme.surface,
             shape = RoundedCornerShape(8.dp),
@@ -61,7 +60,7 @@ fun ShellScreen() {
         ) {
             Box(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = output.ifBlank { "C:\\> Ready\nType a command and press Send." },
+                    text = output.ifBlank { "Ready – enter a shell command and press Send." },
                     color = colorScheme.onSurface,
                     fontFamily = FontFamily.Monospace,
                     fontSize = 14.sp,
@@ -70,7 +69,6 @@ fun ShellScreen() {
             }
         }
 
-        // Input row
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -78,7 +76,7 @@ fun ShellScreen() {
             OutlinedTextField(
                 value = command,
                 onValueChange = { command = it },
-                placeholder = { Text("e.g., dir", color = colorScheme.onSurfaceVariant) },
+                placeholder = { Text("e.g., ls /sdcard", color = colorScheme.onSurfaceVariant) },
                 textStyle = TextStyle(color = colorScheme.onSurface, fontFamily = FontFamily.Monospace),
                 colors = OutlinedTextFieldDefaults.colors(),
                 modifier = Modifier.weight(1f),
