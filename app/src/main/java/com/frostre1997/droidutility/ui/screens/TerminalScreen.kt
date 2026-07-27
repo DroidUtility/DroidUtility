@@ -4,6 +4,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -158,10 +160,7 @@ fun TerminalScreen() {
                 .weight(1f)
                 .fillMaxWidth()
                 .background(Color(0xFF0A0A0A), RoundedCornerShape(8.dp))
-                .combinedClickable(
-                    onClick = { /* ignore */ },
-                    onLongClick = { copyAllOutput() }
-                )
+                .clickable { /* ignore */ }
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(8.dp),
