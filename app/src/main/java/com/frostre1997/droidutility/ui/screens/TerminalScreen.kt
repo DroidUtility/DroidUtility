@@ -89,7 +89,8 @@ fun TerminalScreen() {
     fun clearOutput() { outputLines.clear() }
 
     fun copyAllOutput() {
-        val text = outputLines.joinToString("") { it.text }
+        val text = outputLines.joinToString("
+") { it.text }
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Terminal Output", text)
         clipboard.setPrimaryClip(clip)
@@ -97,16 +98,16 @@ fun TerminalScreen() {
     }
 
     fun handleKeyEvent(event: KeyEvent): Boolean {
-        if (event.type == KeyEventType.KeyDown) {
+        if (event.keyEventType == KeyEventType.KeyDown) {
             when (event.key) {
-                Key.ArrowUp -> {
+                Key.DirectionUp -> {
                     if (historyIndex > 0) {
                         historyIndex--
                         inputText = history.getOrElse(historyIndex) { "" }
                     }
                     return true
                 }
-                Key.ArrowDown -> {
+                Key.DirectionDown -> {
                     if (historyIndex < history.size - 1) {
                         historyIndex++
                         inputText = history.getOrElse(historyIndex) { "" }
