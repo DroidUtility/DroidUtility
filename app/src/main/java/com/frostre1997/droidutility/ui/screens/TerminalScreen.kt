@@ -1,7 +1,5 @@
 package com.frostre1997.droidutility.ui.screens
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,7 +11,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -89,15 +86,6 @@ fun TerminalScreen() {
         outputLines.clear()
     }
 
-    fun copyAllOutput() {
-        val text = outputLines.joinToString("
-") { it.text }
-        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("Terminal Output", text)
-        cm.setPrimaryClip(clip)
-        context.toast("Copied to clipboard")
-    }
-
     fun handleKeyEvent(event: KeyEvent): Boolean {
         if (event.key == Key.Enter) {
             executeCommand(inputText)
@@ -125,12 +113,6 @@ fun TerminalScreen() {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             Row {
-                IconButton(
-                    onClick = { copyAllOutput() },
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = "Copy", tint = Color(0xFF00FF00))
-                }
                 IconButton(
                     onClick = { clearOutput() },
                     modifier = Modifier.size(36.dp)
@@ -211,4 +193,4 @@ fun TerminalScreen() {
             }
         }
     }
-                                            }
+}
