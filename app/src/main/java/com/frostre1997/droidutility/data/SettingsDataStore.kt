@@ -11,7 +11,7 @@ object SettingsDataStore {
     // Theme
     val THEME_MODE = stringPreferencesKey("theme_mode")
     val USE_DYNAMIC_COLOR = booleanPreferencesKey("use_dynamic_color")
-    val ACCENT_COLOR = stringPreferencesKey("accent_color") // "blue", "green", "red", etc.
+    val ACCENT_COLOR = stringPreferencesKey("accent_color")
 
     // Terminal
     val TERMINAL_FONT_SIZE = floatPreferencesKey("terminal_font_size")
@@ -29,10 +29,9 @@ object SettingsDataStore {
     val ENABLE_TELEMETRY = booleanPreferencesKey("enable_telemetry")
     val ENABLE_CRASH_REPORTS = booleanPreferencesKey("enable_crash_reports")
 
-    // vFlow‑style extras
+    // Extras
     val LANGUAGE = stringPreferencesKey("language")
     val COLORFUL_WORKFLOW_CARDS = booleanPreferencesKey("colorful_workflow_cards")
-    val LIQUID_GLASS_NAV = booleanPreferencesKey("liquid_glass_nav")
     val UI_SCALE = floatPreferencesKey("ui_scale")
 
     // Defaults
@@ -44,5 +43,4 @@ object SettingsDataStore {
     fun getDefaultBoolean(): Boolean = false
     fun getDefaultLanguage(): String = "en"
     fun getDefaultUIScale(): Float = 1.0f
-    fun getDefaultLiquidGlassNav(): Boolean = true   // <-- added
 }
