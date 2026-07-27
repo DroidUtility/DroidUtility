@@ -127,15 +127,33 @@ fun DebloatScreen() {
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Search apps...", color = colorScheme.onSurfaceVariant) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = colorScheme.onSurfaceVariant) },
+            placeholder = { 
+                Text(
+                    text = "Search apps...", 
+                    color = colorScheme.onSurfaceVariant
+                ) 
+            },
+            leadingIcon = { 
+                Icon(
+                    Icons.Default.Search, 
+                    contentDescription = null, tint = colorScheme.onSurfaceVariant
+                ) 
+            },
             textStyle = TextStyle(color = colorScheme.onSurface),
-            colors = OutlinedTextFieldDefaults.colors(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorScheme.primary,
+                unfocusedBorderColor = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                cursorColor = colorScheme.primary,
+                containerColor = colorScheme.surface
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .background(colorScheme.surface, shape = RoundedCornerShape(16.dp))
-                .border(1.dp, colorScheme.onSurfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                .border(
+                    1.dp, 
+                    colorScheme.onSurfaceVariant.copy(alpha = 0.3f), 
+                    RoundedCornerShape(16.dp))
         )
 
         Row(
