@@ -5,6 +5,7 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
+import rikka.shizuku.shell.Shell
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -89,20 +90,43 @@ object ShizukuShellManager {
     }
 
     /**
-     * Execute a command using Runtime.exec() (fallback).
-     * If Shizuku is available and permission is granted, we could use it,
-     * but the shell package is missing in this version.
+     * Execute a shell command via Shizuku's shell API.
+     * This gives you full stdout/stderr capture and exit codes.
      */
     suspend fun executeCommand(command: String): ShellResult = withContext(Dispatchers.IO) {
+        // Check Shizuku status
+        if (!checkAvailability()) {
+            return@withContext ShellResult(false, "", "Shizuku is not available. Please start Shizuku first.", -1)
+        }
+        if (!hasPermission()) {
+            return@withContext ShellResult(false, "", "Shizuku permission not granted. Please grant permission.", -1)
+        }
+
         return@withContext runCatching {
-            val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
-            val exitCode = process.waitFor()
-            val stdout = process.inputStream.bufferedReader().readText()
-            val stderr = process.errorStream.bufferedReader().readText()
+            // Create a shell and run the command
+            val shell = Shizuku.newShell(arrayOf("sh", "-c", command))
+            val exitCode = shell.waitFor()
+            val stdout = StringBuilder()
+            val stderr = StringBuilder()
+
+            // Read stdout
+            shell.getStdout()?.use { input ->
+                BufferedReader(InputStreamReader(input)).useLines { lines ->
+                    lines.forEach { stdout.appendLine(it) }
+                }
+            }
+            // Read stderr
+            shell.getStderr()?.use { input ->
+                BufferedReader(InputStreamReader(input)).useLines { lines ->
+                    lines.forEach { stderr.appendLine(it) }
+                }
+            }
+            shell.close()
+
             ShellResult(
                 success = exitCode == 0,
-                output = stdout.trimEnd(),
-                error = stderr.trimEnd(),
+                output = stdout.toString().trimEnd(),
+                error = stderr.toString().trimEnd(),
                 exitCode = exitCode
             )
         }.getOrElse { e ->
@@ -120,4 +144,21 @@ object ShizukuShellManager {
         val error: String,
         val exitCode: Int
     )
+}
+
+/**
+ * Display helper for ShellResult.
+ */
+fun ShizukuShellManager.ShellResult.displayText(): String = buildString {
+    appendLine("Exit code: $exitCode")
+    appendLine()
+    if (output.isNotBlank()) {
+        appendLine("--- STDOUT ---")
+        appendLine(output)
+    }
+    if (error.isNotBlank()) {
+        appendLine("--- STDERR ---")
+        appendLine(error)
+    }
+    if (output.isBlank() && error.isBlank()) append("(no output)")
 }
