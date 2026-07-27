@@ -117,16 +117,7 @@ class SettingsManager(private val context: Context) {
     suspend fun setColorfulWorkflowCards(enabled: Boolean) {
         context.dataStore.edit { prefs -> prefs[SettingsDataStore.COLORFUL_WORKFLOW_CARDS] = enabled }
     }
-
-    // === Liquid Glass navigation ===
-    fun getLiquidGlassNavFlow(): Flow<Boolean> =
-        context.dataStore.data.map { prefs ->
-            prefs[SettingsDataStore.LIQUID_GLASS_NAV] ?: SettingsDataStore.getDefaultBoolean()
-        }
-    suspend fun setLiquidGlassNav(enabled: Boolean) {
-        context.dataStore.edit { prefs -> prefs[SettingsDataStore.LIQUID_GLASS_NAV] = enabled }
-    }
-
+    
     // === UI scale ===
     fun getUIScaleFlow(): Flow<Float> =
         context.dataStore.data.map { prefs ->
