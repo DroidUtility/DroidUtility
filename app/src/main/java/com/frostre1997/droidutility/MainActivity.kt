@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 CompositionLocalProvider(LocalDensity provides scaledDensity) {
                     Surface(modifier = Modifier.fillMaxSize()) {
-                        MainScreen(settingsManager = settingsManager)
+                        MainScreen()  // no parameter
                     }
                 }
             }
