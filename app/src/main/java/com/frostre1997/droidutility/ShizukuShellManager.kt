@@ -5,6 +5,9 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
+import rikka.shizuku.shell.Shell
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 object ShizukuShellManager {
     private const val TAG = "ShizukuShellManager"
@@ -86,8 +89,46 @@ object ShizukuShellManager {
         }
     }
 
+    /**
+     * Execute a shell command via Shizuku and return the result.
+     * Works even if Shizuku is not running – returns an error message.
+     */
     suspend fun executeCommand(command: String): ShellResult = withContext(Dispatchers.IO) {
-        ShellResult(false, "", "Shell execution not implemented yet", -1)
+        if (!checkAvailability()) {
+            return@withContext ShellResult(false, "", "Shizuku is not available. Please start Shizuku first.", -1)
+        }
+        if (!hasPermission()) {
+            return@withContext ShellResult(false, "", "Shizuku permission not granted. Please grant permission.", -1)
+        }
+
+        return@withContext runCatching {
+            // Use Shizuku's shell to run the command
+            val shell = Shizuku.newShell(arrayOf("sh", "-c", command))
+            val result = shell.waitFor()
+            val stdout = StringBuilder()
+            val stderr = StringBuilder()
+
+            shell.getStdout()?.use { input ->
+                BufferedReader(InputStreamReader(input)).useLines { lines ->
+                    lines.forEach { stdout.appendLine(it) }
+                }
+            }
+            shell.getStderr()?.use { input ->
+                BufferedReader(InputStreamReader(input)).useLines { lines ->
+                    lines.forEach { stderr.appendLine(it) }
+                }
+            }
+            shell.close()
+
+            ShellResult(
+                success = result == 0,
+                output = stdout.toString().trimEnd(),
+                error = stderr.toString().trimEnd(),
+                exitCode = result
+            )
+        }.getOrElse { e ->
+            ShellResult(false, "", "Exception: ${e.message}", -1)
+        }
     }
 
     suspend fun executeCommands(commands: List<String>): List<ShellResult> {
