@@ -182,17 +182,28 @@ fun SettingSlider(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Text(label, color = colorScheme.onSurface)
-        Slider(
-            value = value,
-            onValueChange = onValueChange,
-            valueRange = range,
-            steps = (range.endInclusive - range.start).toInt() * 2,
-            colors = SliderDefaults.colors(
-                thumbColor = colorScheme.primary,
-                activeTrackColor = colorScheme.primary
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Slider(
+                value = value,
+                onValueChange = onValueChange,
+                valueRange = range,
+                steps = (range.endInclusive - range.start).toInt() * 2,
+                colors = SliderDefaults.colors(
+                    thumbColor = colorScheme.primary,
+                    activeTrackColor = colorScheme.primary
+                ),
+                modifier = Modifier.weight(1f)
             )
-        )
-        Text("Current: ${(value * 100).toInt()}%", color = colorScheme.onSurfaceVariant)
+            Text(
+                text = "Current: ${(value * 100).toInt()}%",
+                color = colorScheme.onSurfaceVariant,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
     }
 }
 
@@ -366,7 +377,7 @@ fun SettingsScreen() {
     var searchQuery by remember { mutableStateOf("") }
     val colorScheme = MaterialTheme.colorScheme
 
-    // Collect states
+    // States
     val themeMode by settingsManager.getThemeModeFlow().collectAsState(initial = "SYSTEM")
     val dynamicColor by settingsManager.getDynamicColorFlow().collectAsState(initial = false)
     val terminalFontSize by settingsManager.getTerminalFontSizeFlow().collectAsState(initial = 16f)
@@ -393,7 +404,7 @@ fun SettingsScreen() {
         }
     }
 
-    // Build groups – no Liquid Glass toggle
+    // Build groups
     val groups = buildList {
         // Language
         add(
@@ -414,7 +425,7 @@ fun SettingsScreen() {
             )
         )
 
-        // Appearance – no Liquid Glass
+        // Appearance
         add(
             SettingsGroup(
                 title = "Appearance",
@@ -431,6 +442,7 @@ fun SettingsScreen() {
                     SettingsItem.Switch("Colorful workflow cards (Beta)", colorfulWorkflowCards) {
                         coroutineScope.launch { settingsManager.setColorfulWorkflowCards(it) }
                     },
+                    // Liquid Glass removed
                     SettingsItem.Slider("Scale", uiScale, 0.5f..1.5f) { newScale ->
                         coroutineScope.launch { settingsManager.setUIScale(newScale) }
                     },
@@ -559,7 +571,7 @@ fun SettingsScreen() {
                     is SettingsItem.Switch -> item.label.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.SwitchWithDesc -> item.label.contains(searchQuery, ignoreCase = true) || item.description.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.Slider -> item.label.contains(searchQuery, ignoreCase = true)
-                    is SettingsItem.Dropdown -> item.label.contains(searchQuery, ignoreCase = true) || item.current.contains(searchQuery, ignoreCase = true)
+                    is SettingsItem.Dropdown -> item.label.contains(searchQuery, ignoreCase = true) || item.current.contains(searchQuery, ignoreCase = true) || item.current.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.Button -> item.label.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.Label -> item.text.contains(searchQuery, ignoreCase = true)
                     is SettingsItem.Action -> item.label.contains(searchQuery, ignoreCase = true)
@@ -606,6 +618,7 @@ fun SettingsScreen() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column {
+                        // Group title (inside the card)
                         Text(
                             text = group.title,
                             color = colorScheme.primary,
