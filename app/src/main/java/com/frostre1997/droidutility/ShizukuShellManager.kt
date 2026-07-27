@@ -5,7 +5,7 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
-import rikka.shizuku.shell.Shell
+import rikka.shizuku.shell.Shell   // now resolves
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -15,7 +15,6 @@ object ShizukuShellManager {
 
     @Volatile
     private var isBinderReceived = false
-
     @Volatile
     private var isPermissionGranted = false
 
@@ -90,11 +89,10 @@ object ShizukuShellManager {
     }
 
     /**
-     * Execute a shell command via Shizuku's shell API.
-     * This gives you full stdout/stderr capture and exit codes.
+     * Execute a shell command via Shizuku's official shell API.
+     * This uses the `shell` artifact and gives you full stdout/stderr/exit code.
      */
     suspend fun executeCommand(command: String): ShellResult = withContext(Dispatchers.IO) {
-        // Check Shizuku status
         if (!checkAvailability()) {
             return@withContext ShellResult(false, "", "Shizuku is not available. Please start Shizuku first.", -1)
         }
@@ -103,19 +101,16 @@ object ShizukuShellManager {
         }
 
         return@withContext runCatching {
-            // Create a shell and run the command
             val shell = Shizuku.newShell(arrayOf("sh", "-c", command))
             val exitCode = shell.waitFor()
             val stdout = StringBuilder()
             val stderr = StringBuilder()
 
-            // Read stdout
             shell.getStdout()?.use { input ->
                 BufferedReader(InputStreamReader(input)).useLines { lines ->
                     lines.forEach { stdout.appendLine(it) }
                 }
             }
-            // Read stderr
             shell.getStderr()?.use { input ->
                 BufferedReader(InputStreamReader(input)).useLines { lines ->
                     lines.forEach { stderr.appendLine(it) }
@@ -146,9 +141,6 @@ object ShizukuShellManager {
     )
 }
 
-/**
- * Display helper for ShellResult.
- */
 fun ShizukuShellManager.ShellResult.displayText(): String = buildString {
     appendLine("Exit code: $exitCode")
     appendLine()
