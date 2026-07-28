@@ -38,13 +38,13 @@ fun FloatingBottomBar(
                 .widthIn(max = 420.dp)
                 .height(68.dp)
                 .padding(horizontal = 4.dp),
-            color = colorScheme.surface.copy(alpha = 0.85f), // adaptive semi‑transparent
+            color = colorScheme.background.copy(alpha = 0.85f), // follows background
             shape = RoundedCornerShape(34.dp),
             shadowElevation = 10.dp,
             tonalElevation = 0.dp,
             border = androidx.compose.foundation.BorderStroke(
                 width = 1.dp,
-                color = colorScheme.onSurface.copy(alpha = 0f)
+                color = colorScheme.onBackground.copy(alpha = 0.12f) // subtle border
             )
         ) {
             Row(
@@ -65,13 +65,13 @@ fun FloatingBottomBar(
                         Icon(
                             screen.icon,
                             contentDescription = screen.title,
-                            tint = if (selected) colorScheme.primary else colorScheme.onSurfaceVariant,
+                            tint = if (selected) colorScheme.primary else colorScheme.onBackground,
                             modifier = Modifier.size(26.dp)
                         )
                         Text(
                             screen.title,
                             fontSize = 11.sp,
-                            color = if (selected) colorScheme.primary else colorScheme.onSurfaceVariant,
+                            color = if (selected) colorScheme.primary else colorScheme.onBackground,
                             maxLines = 1,
                             modifier = Modifier.padding(top = 3.dp)
                         )
