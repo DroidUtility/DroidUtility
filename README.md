@@ -1,5 +1,7 @@
 ![description](https://github.com/frostre1997/DroidUtility/blob/main/app/src/main/res/drawable/play_store_512.png)
 
+[![Custom Build Status](https://img.shields.io/badge/build-passing-00e676?style=for-the-badge&logo=android&logoColor=white)](https://github.com/frostre1997/DroidUtility/actions)
+
 # DroidUtility
 
 ## [![Android CI](https://github.com/frostre1997/DroidUtility/actions/workflows/build.yml/badge.svg)](https://github.com/frostre1997/DroidUtility/actions/workflows/build.yml) [![pages-build-deployment](https://github.com/frostre1997/DroidUtility/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/frostre1997/DroidUtility/actions/workflows/pages/pages-build-deployment)
