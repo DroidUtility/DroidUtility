@@ -4,8 +4,8 @@
   <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android2.svg">
   <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Kotlin/kotlin2.svg">
   <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Github/github3.svg">
-  <a href="https://github.com/frostre1997/DroidUtility/blob/main/LICENSE"><img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceMIT/licencemit2.svg"></a>
-  <a href="https://github.com/frostre1997/DroidUtility/actions"><img src="https://img.shields.io/github/actions/workflow/status/frostre1997/DroidUtility/build.yml?style=flat-square&logo=github&label=build"></a>
+  <a href="https://github.com/frostre1997/YOUR_REPOSITORY_NAME/blob/main/LICENSE"><img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceMIT/licencemit2.svg"></a>
+  <a href="https://github.com/frostre1997/DroidUtility/actions"><img src="https://img.shields.io/github/actions/workflow/status/frostre1997/DroidUtility/build.yml?style=for-the-badge&logo=github&logoColor=white&color=success"></a>
 </p>
 
 # DroidUtility
