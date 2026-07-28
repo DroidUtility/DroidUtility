@@ -1,6 +1,6 @@
 ![description](https://github.com/frostre1997/DroidUtility/blob/main/app/src/main/res/drawable/play_store_512.png)
 
-[![Custom Build Status](https://img.shields.io/badge/build-passing-00e676?style=for-the-badge&logo=android&logoColor=white)](https://github.com/frostre1997/DroidUtility/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/frostre1997/YOUR_REPOSITORY_NAME/YOUR_WORKFLOW_FILE.yml?style=flat-square&logo=github&label=build)](https://github.com/frostre1997/YOUR_REPOSITORY_NAME/actions)
 
 # DroidUtility
 
