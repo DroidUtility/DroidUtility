@@ -38,11 +38,14 @@ fun FloatingBottomBar(
                 .widthIn(max = 420.dp)
                 .height(68.dp)
                 .padding(horizontal = 4.dp),
-            color = Color.Transparent, // fully transparent
+            color = colorScheme.surface.copy(alpha = 0f), // adaptive semi‑transparent
             shape = RoundedCornerShape(34.dp),
-            shadowElevation = 0.dp, // no shadow
+            shadowElevation = 10.dp,
             tonalElevation = 0.dp,
-            border = null // no border
+            border = androidx.compose.foundation.BorderStroke(
+                width = 1.dp,
+                color = colorScheme.onSurface.copy(alpha = 0.12f)
+            )
         ) {
             Row(
                 modifier = Modifier.fillMaxSize(),
