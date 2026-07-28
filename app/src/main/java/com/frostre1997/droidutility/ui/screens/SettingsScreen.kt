@@ -591,19 +591,23 @@ fun SettingsScreen() {
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
-        // Search bar
+        // Search bar – fixed (no named parameters)
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
             placeholder = { Text("Search settings", color = colorScheme.onSurfaceVariant) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = colorScheme.onSurfaceVariant) )°°},
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = colorScheme.onSurfaceVariant) },
             textStyle = TextStyle(color = colorScheme.onSurface),
             colors = OutlinedTextFieldDefaults.colors(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .background(colorScheme.surface, shape = RoundedCornerShape(16.dp))
-                .border(1.dp, colorScheme.onSurfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                .border(
+                    1.dp,
+                    colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                    RoundedCornerShape(16.dp)
+                )
         )
 
         LazyColumn(
