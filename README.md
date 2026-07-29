@@ -1,17 +1,16 @@
-![description](https://github.com/frostre1997/DroidUtility/blob/main/app/src/main/res/drawable/play_store_512.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/frostre1997/DroidUtility/main/app/src/main/res/drawable/play_store_512.png" alt="DroidUtility Logo" width="500" style="border-radius: 50px; box-shadow: 0 7px 8px rgba(0,0,0,0.2);">
+</p>
 
 <p align="center">
   <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android2.svg">
   <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Kotlin/kotlin2.svg">
-  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Github/github3.svg">
-  <a href="https://github.com/frostre1997/DroidUtility/blob/main/LICENSE"><img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceMIT/licencemit2.svg"></a>
-  <a href="https://github.com/frostre1997/DroidUtility/actions"><img src="https://img.shields.io/github/actions/workflow/status/frostre1997/DroidUtility/build.yml?style=flat-square&logo=github&label=build"></a>
-</p>
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Github/github1.svg">
+  <a href="https://github.com/frostre1997/DroidUtility/blob/main/LICENSE">
+    <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceMIT/licencemit3.svg">
+  </a>
 
 # DroidUtility
-
-## [![Android CI](https://github.com/frostre1997/DroidUtility/actions/workflows/build.yml/badge.svg)](https://github.com/frostre1997/DroidUtility/actions/workflows/build.yml) [![pages-build-deployment](https://github.com/frostre1997/DroidUtility/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/frostre1997/DroidUtility/actions/workflows/pages/pages-build-deployment)
-
 
 A powerful, non-root utility suite for Android designed for system optimization, debloating, and advanced command execution. Built for mobile-only development.
 
