@@ -15,8 +15,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Inter + Material Symbols -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
 
   <style>
     * {
@@ -47,15 +46,6 @@
       padding: 0 20px;
     }
 
-    /* ---- Material Symbols ---- */
-    .icon {
-      font-family: 'Material Symbols Rounded';
-      font-size: 28px;
-      color: #90caf9;
-      display: inline-block;
-      margin-bottom: 12px;
-    }
-
     /* ---- Header ---- */
     header {
       padding: 18px 0;
@@ -84,7 +74,6 @@
     .logo img {
       height: 40px;
       width: 40px;
-      border-radius: 12px;
     }
 
     .logo span {
@@ -111,25 +100,24 @@
       color: #90caf9;
     }
 
-    /* ---- Hero ---- */
+    /* ---- Hero (flat, gradient, with outline badge) ---- */
     .hero {
       padding: 100px 0 70px;
       text-align: center;
-      background: radial-gradient(ellipse at 50% 0%, #1a1a3a 0%, #0d0d0d 70%);
+      background: linear-gradient(180deg, #1a1a3a 0%, #0d0d0d 100%);
       border-bottom: 1px solid #2a2a2a;
     }
 
     .hero .badge {
       display: inline-block;
-      background: rgba(144, 202, 249, 0.12);
+      background: transparent;
       color: #90caf9;
-      padding: 6px 20px;
-      border-radius: 999px;
+      padding: 6px 16px;
       font-size: 0.82rem;
       font-weight: 700;
       letter-spacing: 0.3px;
       margin-bottom: 22px;
-      border: 1px solid rgba(144, 202, 249, 0.2);
+      border: 1px solid #90caf9; /* outline */
     }
 
     .hero h1 {
@@ -158,7 +146,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 14px;
-      margin-bottom: 24px;
+      margin-bottom: 0;
     }
 
     .btn {
@@ -166,64 +154,35 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 12px 32px;
-      border-radius: 999px;
+      padding: 12px 28px;
       font-weight: 700;
       font-size: 0.98rem;
-      border: 1.5px solid transparent;
+      border: 1.5px solid #444; /* outline by default */
+      background: transparent;
+      color: #e8e8e8;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
       min-height: 48px;
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    .btn-primary {
+      border-color: #90caf9;
+      color: #90caf9;
     }
 
-    .btn-primary {
+    .btn-primary:hover {
       background: #90caf9;
       color: #0d0d0d;
     }
 
-    .btn-primary:hover {
-      background: #b3d9ff;
-    }
-
     .btn-outline {
-      background: transparent;
-      color: #e8e8e8;
       border-color: #444;
+      color: #e8e8e8;
     }
 
     .btn-outline:hover {
       border-color: #90caf9;
       color: #90caf9;
-    }
-
-    .command-box {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 12px 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-family: 'Inter', monospace;
-      font-size: 0.95rem;
-      color: #b0b0b0;
-      margin-top: 8px;
-      max-width: 100%;
-      overflow-x: auto;
-    }
-
-    .command-box .prompt {
-      color: #90caf9;
-      font-weight: 600;
-    }
-
-    .command-box .cmd {
-      color: #e8e8e8;
     }
 
     /* ---- Sections ---- */
@@ -255,6 +214,7 @@
       margin: 0 auto 46px;
     }
 
+    /* ---- Cards (flat, with border) ---- */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -264,21 +224,20 @@
     .card {
       background: #1e1e1e;
       padding: 26px 22px;
-      border-radius: 20px;
       border: 1px solid #2a2a2a;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      transition: border-color 0.2s ease;
     }
 
     .card:hover {
-      transform: translateY(-3px);
       border-color: #90caf9;
     }
 
     .card .icon {
+      font-family: 'Material Symbols Rounded';
       font-size: 28px;
-      margin-bottom: 12px;
-      display: block;
       color: #90caf9;
+      display: block;
+      margin-bottom: 12px;
     }
 
     .card h3 {
@@ -292,6 +251,7 @@
       font-size: 0.96rem;
     }
 
+    /* ---- Info boxes (flat, with border) ---- */
     .info-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -301,7 +261,6 @@
     .info-box {
       background: #161616;
       border: 1px solid #2a2a2a;
-      border-radius: 18px;
       padding: 22px;
     }
 
@@ -321,6 +280,7 @@
       margin-left: 18px;
     }
 
+    /* ---- Screenshots (flat, with border) ---- */
     .screenshots .grid {
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
@@ -328,14 +288,13 @@
 
     .screenshot-card {
       background: #1e1e1e;
-      border-radius: 18px;
       overflow: hidden;
       border: 1px solid #2a2a2a;
-      transition: transform 0.2s ease;
+      transition: border-color 0.2s ease;
     }
 
     .screenshot-card:hover {
-      transform: scale(1.02);
+      border-color: #90caf9;
     }
 
     .screenshot-card img {
@@ -353,6 +312,7 @@
       color: #b0b0b0;
     }
 
+    /* ---- Download & footer ---- */
     .download {
       text-align: center;
     }
@@ -420,12 +380,6 @@
       .links-row {
         flex-direction: column;
       }
-
-      .command-box {
-        font-size: 0.8rem;
-        padding: 10px 14px;
-        flex-wrap: wrap;
-      }
     }
   </style>
 </head>
@@ -453,20 +407,13 @@
   <section class="hero">
     <div class="container">
       <div class="badge">No root required • Powered by Shizuku</div>
-      <h1>
-        <span>DroidUtility</span>
-      </h1>
+      <h1><span>DroidUtility</span></h1>
       <p>
         A powerful Android utility suite for debloating, shell command execution, and device management — built for mobile-first development.
       </p>
       <div class="buttons">
         <a href="https://github.com/frostre1997/DroidUtility/releases" class="btn btn-primary">⬇ Download APK</a>
         <a href="https://github.com/frostre1997/DroidUtility" target="_blank" rel="noopener noreferrer" class="btn btn-outline">View on GitHub</a>
-      </div>
-
-      <div class="command-box">
-        <span class="prompt">$</span>
-        <span class="cmd">git clone https://github.com/frostre1997/DroidUtility</span>
       </div>
     </div>
   </section>
@@ -486,52 +433,44 @@
     <div class="container">
       <h2 class="section-title">Features</h2>
       <p class="section-sub">A focused toolset for managing, optimizing, and customizing your Android device.</p>
-
       <div class="grid">
         <div class="card">
-          <span class="icon material-symbols-rounded">terminal</span>
+          <span class="icon">terminal</span>
           <h3>Shell Terminal</h3>
           <p>Run shell commands through Shizuku with real-time output, exit codes, and command history.</p>
         </div>
-
         <div class="card">
-          <span class="icon material-symbols-rounded">cleaning_services</span>
+          <span class="icon">cleaning_services</span>
           <h3>Debloat Manager</h3>
           <p>Browse installed apps, search quickly, filter by system or user apps, and uninstall or disable with one tap.</p>
         </div>
-
         <div class="card">
-          <span class="icon material-symbols-rounded">palette</span>
+          <span class="icon">palette</span>
           <h3>Theme Support</h3>
           <p>Switch between Light, Dark, AMOLED, and System themes with persistent saved preferences.</p>
         </div>
-
         <div class="card">
-          <span class="icon material-symbols-rounded">lock</span>
+          <span class="icon">lock</span>
           <h3>Shizuku Integration</h3>
           <p>Access elevated functionality without root, with permission handling built directly into the app.</p>
         </div>
-
         <div class="card">
-          <span class="icon material-symbols-rounded">phone_android</span>
+          <span class="icon">phone_android</span>
           <h3>Material 3 Interface</h3>
           <p>Enjoy a clean, modern, and responsive design built with Android’s Material 3 visual style.</p>
         </div>
-
         <div class="card">
-          <span class="icon material-symbols-rounded">bolt</span>
+          <span class="icon">bolt</span>
           <h3>Mobile-First Development</h3>
           <p>Designed and developed for Android-first workflows, with a lightweight and practical experience.</p>
         </div>
-
         <div class="card">
-          <span class="icon material-symbols-rounded">extension</span>
+          <span class="icon">extension</span>
           <h3>Xposed / LSPatch Integration</h3>
           <p>Planned for v1.1.0-beta to expand advanced customization and module-based functionality.</p>
         </div>
-
         <div class="card">
-          <span class="icon material-symbols-rounded">check_circle</span>
+          <span class="icon">check_circle</span>
           <h3>Stable and Focused</h3>
           <p>Built to stay useful, maintainable, and easy to use while keeping core tools reliable.</p>
         </div>
@@ -544,7 +483,6 @@
     <div class="container">
       <h2 class="section-title">Requirements</h2>
       <p class="section-sub">What you need before using DroidUtility.</p>
-
       <div class="info-grid">
         <div class="info-box">
           <h3>System</h3>
@@ -554,7 +492,6 @@
             <li>No root required.</li>
           </ul>
         </div>
-
         <div class="info-box">
           <h3>Shizuku</h3>
           <ul>
@@ -563,7 +500,6 @@
             <li>Wireless ADB or root can be used to start it.</li>
           </ul>
         </div>
-
         <div class="info-box">
           <h3>Recommended</h3>
           <ul>
@@ -581,7 +517,6 @@
     <div class="container">
       <h2 class="section-title">Screenshots</h2>
       <p class="section-sub">See DroidUtility in action.</p>
-
       <div class="grid">
         <div class="screenshot-card">
           <img src="https://via.placeholder.com/200x200/1e1e1e/90caf9?text=Terminal" alt="Terminal tab" />
@@ -596,7 +531,6 @@
           <div class="label">Settings</div>
         </div>
       </div>
-
       <p style="text-align:center; margin-top:24px; color:#777; font-size:0.95rem;">
         Replace these placeholders with real screenshots from your app for a more polished presentation.
       </p>
@@ -613,7 +547,6 @@
         <a href="https://github.com/frostre1997/DroidUtility/issues/new/choose" class="btn btn-outline">Report an Issue</a>
       </div>
       <div class="version">Latest version: v1.0.5-beta.6</div>
-
       <div class="links-row">
         <a href="https://github.com/frostre1997/DroidUtility" class="btn btn-outline" target="_blank" rel="noopener noreferrer">Source Code</a>
       </div>
