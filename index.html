@@ -13,9 +13,11 @@
 
   <link rel="icon" href="https://raw.githubusercontent.com/frostre1997/DroidUtility/main/app/src/main/res/drawable/play_store_512.png" />
 
+  <!-- Inter + Font Awesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
     * {
@@ -117,7 +119,7 @@
       font-weight: 700;
       letter-spacing: 0.3px;
       margin-bottom: 22px;
-      border: 1px solid #90caf9; /* outline */
+      border: 1px solid #90caf9;
     }
 
     .hero h1 {
@@ -157,7 +159,7 @@
       padding: 12px 28px;
       font-weight: 700;
       font-size: 0.98rem;
-      border: 1.5px solid #444; /* outline by default */
+      border: 1.5px solid #444;
       background: transparent;
       color: #e8e8e8;
       cursor: pointer;
@@ -233,11 +235,11 @@
     }
 
     .card .icon {
-      font-family: 'Material Symbols Rounded';
       font-size: 28px;
       color: #90caf9;
       display: block;
       margin-bottom: 12px;
+      width: 28px;
     }
 
     .card h3 {
@@ -412,8 +414,8 @@
         A powerful Android utility suite for debloating, shell command execution, and device management — built for mobile-first development.
       </p>
       <div class="buttons">
-        <a href="https://github.com/frostre1997/DroidUtility/releases" class="btn btn-primary">⬇ Download APK</a>
-        <a href="https://github.com/frostre1997/DroidUtility" target="_blank" rel="noopener noreferrer" class="btn btn-outline">View on GitHub</a>
+        <a href="https://github.com/frostre1997/DroidUtility/releases" class="btn btn-primary"><i class="fas fa-download"></i> Download APK</a>
+        <a href="https://github.com/frostre1997/DroidUtility" target="_blank" rel="noopener noreferrer" class="btn btn-outline"><i class="fab fa-github"></i> View on GitHub</a>
       </div>
     </div>
   </section>
@@ -433,44 +435,52 @@
     <div class="container">
       <h2 class="section-title">Features</h2>
       <p class="section-sub">A focused toolset for managing, optimizing, and customizing your Android device.</p>
+
       <div class="grid">
         <div class="card">
-          <span class="icon">terminal</span>
+          <span class="icon"><i class="fas fa-terminal"></i></span>
           <h3>Shell Terminal</h3>
           <p>Run shell commands through Shizuku with real-time output, exit codes, and command history.</p>
         </div>
+
         <div class="card">
-          <span class="icon">cleaning_services</span>
+          <span class="icon"><i class="fas fa-broom"></i></span>
           <h3>Debloat Manager</h3>
           <p>Browse installed apps, search quickly, filter by system or user apps, and uninstall or disable with one tap.</p>
         </div>
+
         <div class="card">
-          <span class="icon">palette</span>
+          <span class="icon"><i class="fas fa-palette"></i></span>
           <h3>Theme Support</h3>
           <p>Switch between Light, Dark, AMOLED, and System themes with persistent saved preferences.</p>
         </div>
+
         <div class="card">
-          <span class="icon">lock</span>
+          <span class="icon"><i class="fas fa-lock"></i></span>
           <h3>Shizuku Integration</h3>
           <p>Access elevated functionality without root, with permission handling built directly into the app.</p>
         </div>
+
         <div class="card">
-          <span class="icon">phone_android</span>
+          <span class="icon"><i class="fas fa-mobile-alt"></i></span>
           <h3>Material 3 Interface</h3>
           <p>Enjoy a clean, modern, and responsive design built with Android’s Material 3 visual style.</p>
         </div>
+
         <div class="card">
-          <span class="icon">bolt</span>
+          <span class="icon"><i class="fas fa-bolt"></i></span>
           <h3>Mobile-First Development</h3>
           <p>Designed and developed for Android-first workflows, with a lightweight and practical experience.</p>
         </div>
+
         <div class="card">
-          <span class="icon">extension</span>
+          <span class="icon"><i class="fas fa-puzzle-piece"></i></span>
           <h3>Xposed / LSPatch Integration</h3>
           <p>Planned for v1.1.0-beta to expand advanced customization and module-based functionality.</p>
         </div>
+
         <div class="card">
-          <span class="icon">check_circle</span>
+          <span class="icon"><i class="fas fa-check-circle"></i></span>
           <h3>Stable and Focused</h3>
           <p>Built to stay useful, maintainable, and easy to use while keeping core tools reliable.</p>
         </div>
@@ -483,6 +493,7 @@
     <div class="container">
       <h2 class="section-title">Requirements</h2>
       <p class="section-sub">What you need before using DroidUtility.</p>
+
       <div class="info-grid">
         <div class="info-box">
           <h3>System</h3>
@@ -492,6 +503,7 @@
             <li>No root required.</li>
           </ul>
         </div>
+
         <div class="info-box">
           <h3>Shizuku</h3>
           <ul>
@@ -500,6 +512,7 @@
             <li>Wireless ADB or root can be used to start it.</li>
           </ul>
         </div>
+
         <div class="info-box">
           <h3>Recommended</h3>
           <ul>
@@ -517,6 +530,7 @@
     <div class="container">
       <h2 class="section-title">Screenshots</h2>
       <p class="section-sub">See DroidUtility in action.</p>
+
       <div class="grid">
         <div class="screenshot-card">
           <img src="https://via.placeholder.com/200x200/1e1e1e/90caf9?text=Terminal" alt="Terminal tab" />
@@ -531,6 +545,7 @@
           <div class="label">Settings</div>
         </div>
       </div>
+
       <p style="text-align:center; margin-top:24px; color:#777; font-size:0.95rem;">
         Replace these placeholders with real screenshots from your app for a more polished presentation.
       </p>
@@ -543,12 +558,13 @@
       <h2 class="section-title">Download</h2>
       <p class="section-sub">Get the latest release and try DroidUtility on your device.</p>
       <div class="buttons">
-        <a href="https://github.com/frostre1997/DroidUtility/releases" class="btn btn-primary">⬇ Download APK</a>
-        <a href="https://github.com/frostre1997/DroidUtility/issues/new/choose" class="btn btn-outline">Report an Issue</a>
+        <a href="https://github.com/frostre1997/DroidUtility/releases" class="btn btn-primary"><i class="fas fa-download"></i> Download APK</a>
+        <a href="https://github.com/frostre1997/DroidUtility/issues/new/choose" class="btn btn-outline"><i class="fas fa-bug"></i> Report an Issue</a>
       </div>
       <div class="version">Latest version: v1.0.5-beta.6</div>
+
       <div class="links-row">
-        <a href="https://github.com/frostre1997/DroidUtility" class="btn btn-outline" target="_blank" rel="noopener noreferrer">Source Code</a>
+        <a href="https://github.com/frostre1997/DroidUtility" class="btn btn-outline" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> Source Code</a>
       </div>
     </div>
   </section>
