@@ -290,65 +290,88 @@
       font-size: 0.96rem;
     }
 
-    /* ---- Download card (pricing style) ---- */
-    .download-card {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #1e1e1e;
+    /* ---- Info boxes ---- */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .info-box {
+      background: #161616;
       border: 1px solid #2a2a2a;
-      padding: 40px 30px;
+      padding: 22px;
+    }
+
+    .info-box h3 {
+      font-size: 1.02rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .info-box p,
+    .info-box li {
+      color: #b0b0b0;
+      font-size: 0.96rem;
+    }
+
+    .info-box ul {
+      margin-left: 18px;
+    }
+
+    /* ---- Screenshots ---- */
+    .screenshots .grid {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .screenshot-card {
+      background: #1e1e1e;
+      overflow: hidden;
+      border: 1px solid #2a2a2a;
+      transition: border-color 0.2s ease;
       text-align: center;
     }
 
-    .download-card .price {
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: #fff;
-      margin: 12px 0 8px;
+    .screenshot-card:hover {
+      border-color: #90caf9;
     }
 
-    .download-card .price small {
-      font-size: 1.2rem;
-      font-weight: 400;
-      color: #888;
+    .screenshot-card img {
+      width: 80%;
+      max-width: 220px;
+      display: block;
+      margin: 12px auto 0;
+      aspect-ratio: 9 / 19;
+      object-fit: cover;
+      background: #2a2a2a;
     }
 
-    .download-card .badge-free {
-      display: inline-block;
-      background: transparent;
-      color: #90caf9;
-      padding: 4px 12px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      border: 1px solid #90caf9;
-      margin-bottom: 12px;
-    }
-
-    .download-card .features-list {
-      list-style: none;
-      padding: 0;
-      margin: 16px 0 24px;
-      text-align: left;
-    }
-
-    .download-card .features-list li {
-      padding: 6px 0;
+    .screenshot-card .label {
+      padding: 12px;
+      font-size: 0.9rem;
       color: #b0b0b0;
-      font-size: 0.95rem;
     }
 
-    .download-card .features-list li i {
-      color: #90caf9;
-      margin-right: 8px;
-      width: 20px;
+    /* ---- Download & footer ---- */
+    .download {
+      text-align: center;
     }
 
-    .download-card .btn {
-      width: 100%;
+    .version {
+      margin-top: 14px;
+      color: #777;
+      font-size: 0.92rem;
+    }
+
+    .links-row {
+      display: flex;
+      flex-wrap: wrap;
       justify-content: center;
+      gap: 14px;
+      margin-top: 18px;
     }
 
-    /* ---- Footer ---- */
     footer {
       padding: 32px 0;
       border-top: 1px solid #2a2a2a;
@@ -359,14 +382,6 @@
 
     footer a {
       color: #90caf9;
-    }
-
-    footer .footer-links {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 20px;
-      margin-top: 10px;
     }
 
     @media (max-width: 480px) {
@@ -381,14 +396,6 @@
       .buttons,
       .links-row {
         flex-direction: column;
-      }
-
-      .download-card {
-        padding: 28px 16px;
-      }
-
-      .download-card .price {
-        font-size: 2.2rem;
       }
     }
   </style>
@@ -406,7 +413,10 @@
       <button class="hamburger" id="hamburger" aria-label="Toggle navigation">☰</button>
 
       <nav class="nav" id="navMenu">
+        <a href="#about">About</a>
         <a href="#features">Features</a>
+        <a href="#requirements">Requirements</a>
+        <a href="#screenshots">Screenshots</a>
         <a href="#download">Download</a>
         <a href="https://github.com/frostre1997/DroidUtility" target="_blank" rel="noopener noreferrer">GitHub</a>
       </nav>
@@ -422,14 +432,24 @@
         A powerful Android utility suite for debloating, shell command execution, and device management — built for mobile-first development.
       </p>
       <div class="buttons">
-        <a href="#download" class="btn btn-primary"><i class="fas fa-download"></i> Download APK</a>
+        <a href="https://github.com/frostre1997/DroidUtility/releases" class="btn btn-primary"><i class="fas fa-download"></i> Download APK</a>
         <a href="https://github.com/frostre1997/DroidUtility" target="_blank" rel="noopener noreferrer" class="btn btn-outline"><i class="fab fa-github"></i> View on GitHub</a>
       </div>
     </div>
   </section>
 
+  <!-- About -->
+  <section class="section dark" id="about">
+    <div class="container">
+      <h2 class="section-title">About the project</h2>
+      <p class="section-sub">
+        DroidUtility is designed for users who want more control over their Android device without root access. It combines terminal tools, debloating features, and a clean Material 3 interface in one compact app.
+      </p>
+    </div>
+  </section>
+
   <!-- Features -->
-  <section class="section dark" id="features">
+  <section class="section" id="features">
     <div class="container">
       <h2 class="section-title">Features</h2>
       <p class="section-sub">A focused toolset for managing, optimizing, and customizing your Android device.</p>
@@ -486,27 +506,79 @@
     </div>
   </section>
 
-  <!-- Download / Pricing card -->
-  <section class="section" id="download">
+  <!-- Requirements -->
+  <section class="section dark" id="requirements">
+    <div class="container">
+      <h2 class="section-title">Requirements</h2>
+      <p class="section-sub">What you need before using DroidUtility.</p>
+
+      <div class="info-grid">
+        <div class="info-box">
+          <h3>System</h3>
+          <ul>
+            <li>Android 7.0+ (API 24).</li>
+            <li>Tested up to Android 14.</li>
+            <li>No root required.</li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <h3>Shizuku</h3>
+          <ul>
+            <li>Shizuku must be installed and running.</li>
+            <li>Permission must be granted inside the app.</li>
+            <li>Wireless ADB or root can be used to start it.</li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <h3>Recommended</h3>
+          <ul>
+            <li>A device with enough storage for app management.</li>
+            <li>A stable connection for Shizuku setup.</li>
+            <li>Latest release for the best compatibility.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots -->
+  <section class="section screenshots" id="screenshots">
+    <div class="container">
+      <h2 class="section-title">Screenshots</h2>
+      <p class="section-sub">See DroidUtility in action.</p>
+
+      <div class="grid">
+        <div class="screenshot-card">
+          <img src="https://via.placeholder.com/200x200/1e1e1e/90caf9?text=Terminal" alt="Terminal" />
+          <div class="label">Terminal</div>
+        </div>
+        <div class="screenshot-card">
+          <img src="https://via.placeholder.com/200x200/1e1e1e/90caf9?text=Debloat" alt="Debloat" />
+          <div class="label">Debloat Manager</div>
+        </div>
+        <div class="screenshot-card">
+          <img src="https://via.placeholder.com/200x200/1e1e1e/90caf9?text=Settings" alt="Settings" />
+          <div class="label">Settings</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download -->
+  <section class="section dark download" id="download">
     <div class="container">
       <h2 class="section-title">Download</h2>
       <p class="section-sub">Get the latest release and try DroidUtility on your device.</p>
-
-      <div class="download-card">
-        <div class="badge-free">Free • Open Source</div>
-        <div class="price">$0 <small>one-time</small></div>
-        <ul class="features-list">
-          <li><i class="fas fa-check"></i> Full terminal & shell access</li>
-          <li><i class="fas fa-check"></i> Debloat manager with app filtering</li>
-          <li><i class="fas fa-check"></i> Theme support (Light, Dark, AMOLED, System)</li>
-          <li><i class="fas fa-check"></i> Shizuku integration for elevated commands</li>
-          <li><i class="fas fa-check"></i> No root required</li>
-          <li><i class="fas fa-check"></i> Lifetime updates included</li>
-        </ul>
+      <div class="buttons">
         <a href="https://github.com/frostre1997/DroidUtility/releases" class="btn btn-primary"><i class="fas fa-download"></i> Download APK</a>
-        <p style="color: #777; font-size: 0.8rem; margin-top: 12px;">
-          Latest version: v1.0.5-beta.6 • Android 7.0+
-        </p>
+        <a href="https://github.com/frostre1997/DroidUtility/issues/new/choose" class="btn btn-outline"><i class="fas fa-bug"></i> Report an Issue</a>
+      </div>
+      <div class="version">Latest version: v1.0.5-beta.6</div>
+
+      <div class="links-row">
+        <a href="https://github.com/frostre1997/DroidUtility" class="btn btn-outline" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> Source Code</a>
       </div>
     </div>
   </section>
@@ -514,12 +586,12 @@
   <!-- Footer -->
   <footer>
     <div class="container">
-      <p>© 2026 <a href="https://github.com/frostre1997" target="_blank" rel="noopener noreferrer">frostre1997</a> • Built with 🤍 for the Android community</p>
-      <div class="footer-links">
-        <a href="https://github.com/frostre1997/DroidUtility" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <p>
+        © 2026 <a href="https://github.com/frostre1997" target="_blank" rel="noopener noreferrer">frostre1997</a> •
+        Built with 🤍 for the Android community •
+        <a href="https://github.com/frostre1997/DroidUtility" target="_blank" rel="noopener noreferrer">GitHub</a> •
         <a href="https://github.com/frostre1997/DroidUtility/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>
-        <a href="https://github.com/frostre1997/DroidUtility/issues/new/choose" target="_blank" rel="noopener noreferrer">Report Issue</a>
-      </div>
+      </p>
     </div>
   </footer>
 
