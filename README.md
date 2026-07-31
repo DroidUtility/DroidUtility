@@ -9,6 +9,7 @@
   <a href="https://github.com/frostre1997/DroidUtility/blob/main/LICENSE">
     <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceMIT/licencemit3.svg">
   </a>
+</p>
 
 # DroidUtility
 
@@ -24,7 +25,7 @@ A powerful, non-root utility suite for Android designed for system optimization,
 - **Theme Support:** Light, Dark, AMOLED (true black), and System themes with persistent storage.
 - **Shizuku Integration:** Uses Shizuku for elevated privileges without root. Permission request is built into the app.
 - **Material 3 UI:** Modern, rounded, responsive design with dark/light mode support.
-- **Xsposed/LSPacth Implantation:** Xsposed Module Implemention for more customizable app's - <ins>coming in update v1.1.0-beta</ins>
+- **Xposed / LSPatch Integration:** Xposed Module Implementation for more customizable apps – coming in update v1.1.0-beta.
 
 ---
 
@@ -74,5 +75,7 @@ cd DroidUtility
 # Build the debug APK
 ./gradlew assembleDebug
 ```
+
 ## Visit my website 🤍
+
 https://frostre1997.github.io/DroidUtility/
