@@ -48,7 +48,7 @@
       padding: 0 20px;
     }
 
-    /* ---- Header ---- */
+    /* ---- Header with hamburger ---- */
     header {
       padding: 18px 0;
       border-bottom: 1px solid #2a2a2a;
@@ -84,6 +84,7 @@
       color: #fff;
     }
 
+    /* ---- Hamburger menu ---- */
     .nav {
       display: flex;
       align-items: center;
@@ -100,6 +101,46 @@
 
     .nav a:hover {
       color: #90caf9;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #fff;
+      background: none;
+      border: none;
+      padding: 4px 8px;
+      user-select: none;
+    }
+
+    .hamburger:hover {
+      color: #90caf9;
+    }
+
+    /* ---- Responsive: show hamburger on small screens ---- */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+
+      .nav {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+        padding: 16px 0 8px;
+        border-top: 1px solid #2a2a2a;
+        margin-top: 12px;
+      }
+
+      .nav.open {
+        display: flex;
+      }
+
+      header .container {
+        flex-wrap: wrap;
+      }
     }
 
     /* ---- Hero ---- */
@@ -345,30 +386,6 @@
       color: #90caf9;
     }
 
-    @media (max-width: 768px) {
-      header .container {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .nav {
-        justify-content: flex-start;
-        gap: 14px;
-      }
-
-      .hero {
-        padding: 70px 0 50px;
-      }
-
-      .hero p {
-        font-size: 1rem;
-      }
-
-      .section {
-        padding: 66px 0;
-      }
-    }
-
     @media (max-width: 480px) {
       .logo span {
         font-size: 1.08rem;
@@ -387,14 +404,21 @@
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- Header with hamburger -->
   <header>
     <div class="container">
       <div class="logo">
         <img src="https://raw.githubusercontent.com/frostre1997/DroidUtility/main/app/src/main/res/drawable/play_store_512.png" alt="DroidUtility logo" />
         <span>DroidUtility</span>
       </div>
-      <nav class="nav" aria-label="Primary">
+
+      <!-- Hamburger icon (visible on mobile) -->
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+        ☰
+      </button>
+
+      <!-- Navigation links -->
+      <nav class="nav" id="navMenu" aria-label="Primary">
         <a href="#about">About</a>
         <a href="#features">Features</a>
         <a href="#requirements">Requirements</a>
@@ -580,6 +604,14 @@
       </p>
     </div>
   </footer>
+
+  <!-- JavaScript to toggle the menu -->
+  <script>
+    document.getElementById('hamburger').addEventListener('click', function() {
+      var menu = document.getElementById('navMenu');
+      menu.classList.toggle('open');
+    });
+  </script>
 
 </body>
   </html>
