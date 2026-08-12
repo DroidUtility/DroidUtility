@@ -78,4 +78,4 @@ cd DroidUtility
 
 ## Visit my website 🤍
 
-https://frostre1997.github.io/DroidUtility/
+https://droidutility.github.io/DroidUtility/
