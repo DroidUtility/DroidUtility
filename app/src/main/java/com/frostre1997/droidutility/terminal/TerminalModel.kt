@@ -18,8 +18,8 @@ class TerminalModel(
     private val _grid = MutableStateFlow(List(rows) { Array(columns) { Cell() } })
     val grid: StateFlow<List<Array<Cell>>> = _grid.asStateFlow()
 
-    private var cursorRow = 0
-    private var cursorCol = 0
+    var cursorRow = 0
+    var cursorCol = 0
     private var currentFg = 0x00FF00
     private var currentBg = 0x000000
 
