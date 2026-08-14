@@ -65,8 +65,8 @@ android {
         applicationId = "com.frostre1997.droidutility"
         minSdk = 24
         targetSdk = 34
-        versionCode = appVersionCode   // uses the dynamic version code
-        versionName = appVersionName   // uses the dynamic version name
+        versionCode = 10005
+        versionName = "1.0.5-beta.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
