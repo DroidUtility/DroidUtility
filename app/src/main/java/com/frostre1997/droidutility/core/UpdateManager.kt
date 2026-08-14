@@ -30,6 +30,17 @@ object UpdateManager {
         val browser_download_url: String
     )
 
+    private fun compareVersions(v1: String, v2: String): Int {
+        val parts1 = v1.split('.').map { it.toIntOrNull() ?: 0 }
+        val parts2 = v2.split('.').map { it.toIntOrNull() ?: 0 }
+        for (i in 0 until maxOf(parts1.size, parts2.size)) {
+            val a = parts1.getOrElse(i) { 0 }
+            val b = parts2.getOrElse(i) { 0 }
+            if (a != b) return a - b
+        }
+        return 0
+    }
+
     suspend fun checkForUpdate(context: Context): String? {
         return try {
             val client = OkHttpClient.Builder()
