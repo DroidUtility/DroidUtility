@@ -4,60 +4,6 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-// --- Versioning logic (unchanged) ---
-data class SemVer(
-    val major: Int,
-    val minor: Int,
-    val patch: Int,
-    val preReleaseType: Int,
-    val preReleaseNumber: Int
-)
-
-fun parseSemVer(tag: String): SemVer {
-    val clean = tag.removePrefix("v")
-    val main = clean.substringBefore('-')
-    val pre = clean.substringAfter('-', "")
-
-    val parts = main.split(".")
-    val major = parts.getOrNull(0)?.toIntOrNull() ?: 0
-    val minor = parts.getOrNull(1)?.toIntOrNull() ?: 0
-    val patch = parts.getOrNull(2)?.toIntOrNull() ?: 0
-
-    val (preType, preNumber) = if (pre.isBlank()) {
-        9 to 0
-    } else {
-        val type = pre.substringBefore('.').lowercase()
-        val number = pre.substringAfter('.', "0").toIntOrNull() ?: 0
-        val rank = when (type) {
-            "alpha" -> 1
-            "beta" -> 2
-            "rc" -> 3
-            else -> 0
-        }
-        rank to number
-    }
-
-    return SemVer(major, minor, patch, preType, preNumber)
-}
-
-fun semVerToCode(v: SemVer): Int {
-    val base = v.major * 1_000_000 + v.minor * 10_000 + v.patch * 100
-    return if (v.preReleaseType == 9) {
-        base + 99
-    } else {
-        base + v.preReleaseType * 10 + (v.preReleaseNumber.coerceAtMost(9))
-    }
-}
-
-val gitTag = providers.exec {
-    commandLine("git", "describe", "--tags", "--abbrev=0")
-}.standardOutput.asText.get().trim()
-
-val appVersionName = if (gitTag.isBlank()) "v1.0.5-beta.10" else gitTag
-val parsed = parseSemVer(appVersionName)
-val appVersionCode = semVerToCode(parsed)
-
-// --- Android configuration ---
 android {
     namespace = "com.frostre1997.droidutility"
     compileSdk = 36
@@ -102,9 +48,8 @@ android {
     }
 }
 
-// --- Dependencies (ordered by category) ---
 dependencies {
-    // Compose BOM – unchanged
+    // Compose BOM
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.00"))
 
