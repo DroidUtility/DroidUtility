@@ -134,7 +134,7 @@ dependencies {
 
     // Networking & serialization
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.14.0")
 
     // DataStore & coroutines
     implementation("androidx.datastore:datastore-preferences:1.1.1")
