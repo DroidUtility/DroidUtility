@@ -1,4 +1,4 @@
-package com.frostre1997.droidutility.managers
+package com.frostre1997.droidutility.core
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
