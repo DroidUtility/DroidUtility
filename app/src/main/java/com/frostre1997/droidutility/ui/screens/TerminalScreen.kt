@@ -13,6 +13,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.terminal.TerminalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
