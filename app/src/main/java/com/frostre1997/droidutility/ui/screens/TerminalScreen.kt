@@ -4,19 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compute.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.foundation.Canvas
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compute.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compute.ui.platform.LocalDensity
+import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.terminal.TerminalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +28,6 @@ fun TerminalScreen() {
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
 
-    // Start the shell process
     LaunchedEffect(Unit) {
         val process = try {
             val hasSu = java.io.File("/system/bin/su").exists()
@@ -45,13 +41,11 @@ fun TerminalScreen() {
         }
         shellProcess = process
 
-        // Set the prompt via PS1 (cosmetic)
         process.outputStream.use {
             it.write("export PS1='$ '\n".toByteArray())
             it.flush()
         }
 
-        // Read stdout in background
         coroutineScope.launch(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(process.inputStream))
             val buffer = CharArray(1024)
@@ -64,7 +58,6 @@ fun TerminalScreen() {
             }
         }
 
-        // Send user input from the channel to stdin
         coroutineScope.launch {
             for (input in model.inputChannel) {
                 process.outputStream.write(input.toByteArray())
@@ -124,7 +117,7 @@ fun TerminalScreen() {
 
             val paint = android.graphics.Paint().apply {
                 this.textSize = fontSize
-                typeface = FontFamily.Monospace.toTypeface()
+                typeface = android.graphics.Typeface.MONOSPACE
                 isAntiAlias = true
             }
 
@@ -134,14 +127,12 @@ fun TerminalScreen() {
                     val x = col * charWidth
                     val y = (row + 1) * charHeight
 
-                    // Draw background
                     drawRect(
                         color = Color(cell.background),
                         topLeft = Offset(x, y - charHeight),
                         size = Size(charWidth, charHeight)
                     )
 
-                    // Draw character
                     drawContext.canvas.nativeCanvas.drawText(
                         cell.char.toString(),
                         x,
@@ -151,7 +142,6 @@ fun TerminalScreen() {
                 }
             }
 
-            // Draw cursor
             val cursorRow = model.cursorRow
             val cursorCol = model.cursorCol
             drawRect(
