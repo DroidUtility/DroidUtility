@@ -3,24 +3,20 @@ package com.frostre1997.droidutility.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
+import androidx.compute.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.asAndroidPaint
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.terminal.TerminalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,7 +33,6 @@ fun TerminalScreen() {
 
     // Start the shell process
     LaunchedEffect(Unit) {
-        // Use ShellManager to start an interactive shell
         val process = try {
             val hasSu = java.io.File("/system/bin/su").exists()
             if (hasSu) {
@@ -124,12 +119,13 @@ fun TerminalScreen() {
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val fontSize = with(density) { 16.sp.toPx() }
-            val charWidth = fontSize * 0.6f // approximate monospace width
+            val charWidth = fontSize * 0.6f
             val charHeight = fontSize * 1.2f
 
-            val paint = Paint().apply {
+            val paint = android.graphics.Paint().apply {
                 this.textSize = fontSize
                 typeface = FontFamily.Monospace.toTypeface()
+                isAntiAlias = true
             }
 
             for (row in grid.indices) {
@@ -141,8 +137,8 @@ fun TerminalScreen() {
                     // Draw background
                     drawRect(
                         color = Color(cell.background),
-                        topLeft = androidx.compose.ui.geometry.Offset(x, y - charHeight),
-                        size = androidx.compose.ui.geometry.Size(charWidth, charHeight)
+                        topLeft = Offset(x, y - charHeight),
+                        size = Size(charWidth, charHeight)
                     )
 
                     // Draw character
@@ -150,18 +146,18 @@ fun TerminalScreen() {
                         cell.char.toString(),
                         x,
                         y - 2f,
-                        paint.asAndroidPaint().apply { color = cell.foreground }
+                        paint.apply { color = cell.foreground }
                     )
                 }
             }
 
-            // Draw cursor (blinking rectangle)
+            // Draw cursor
             val cursorRow = model.cursorRow
             val cursorCol = model.cursorCol
             drawRect(
                 color = Color.White,
-                topLeft = androidx.compose.ui.geometry.Offset(cursorCol * charWidth, cursorRow * charHeight),
-                size = androidx.compose.ui.geometry.Size(charWidth, charHeight),
+                topLeft = Offset(cursorCol * charWidth, cursorRow * charHeight),
+                size = Size(charWidth, charHeight),
                 alpha = 0.5f
             )
         }
