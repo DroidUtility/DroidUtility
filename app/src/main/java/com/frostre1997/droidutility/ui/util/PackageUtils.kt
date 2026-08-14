@@ -20,6 +20,10 @@ object PackageUtils {
         val pm = context.packageManager
         val packages = pm.getInstalledPackages(PackageManager.GET_META_DATA)
         return packages.map { pkg ->
+            
+            val appInfo = pkg.applicationInfo
+            val flags = appInfo?.flags ?: 
+            
             InstalledApp(
                 packageName = pkg.packageName,
                 name = getAppName(pm, pkg),
