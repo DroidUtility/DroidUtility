@@ -10,10 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compute.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compute.ui.platform.LocalDensity
+import androidx.compute.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.Canvas
-import androidx.compose.ui.graphics.Paint
 import com.frostre1997.droidutility.terminal.TerminalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
