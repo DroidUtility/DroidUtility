@@ -7,15 +7,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
-import com.android.terminal_emulator.TerminalView
-import com.frostre1997.droidutility.core.TerminalManager
+import jackpal.androidterm.emulatorview.EmulatorView
+import com.frostre1997.droidutility.managers.TerminalManager
 
 @Composable
 fun TerminalScreen() {
     val session = remember { TerminalManager.startSession() }
 
     DisposableEffect(Unit) {
-        onDispose { }
+        onDispose { /* keep alive */ }
     }
 
     Column(
@@ -25,12 +25,11 @@ fun TerminalScreen() {
     ) {
         AndroidView(
             factory = { context ->
-                TerminalView(context).apply {
+                EmulatorView(context).apply {
                     attachSession(session)
-                    setUseWideCharacterFormatting(true)
-                    setTextColor(0xFF00FF00.toInt())
-                    setBackgroundColor(0xFF000000.toInt())
-                    setCursorColor(0xFFFFFFFF.toInt())
+                    setTextColor(0xFF00FF00.toInt())   // green
+                    setBackgroundColor(0xFF000000.toInt()) // black
+                    setCursorColor(0xFFFFFFFF.toInt()) // white
                     setTextSize(16f)
                 }
             },
