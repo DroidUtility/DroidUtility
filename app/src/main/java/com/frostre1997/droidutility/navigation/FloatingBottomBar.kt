@@ -1,5 +1,6 @@
 package com.frostre1997.droidutility.navigation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +43,7 @@ fun FloatingBottomBar(
             shape = RoundedCornerShape(34.dp),
             shadowElevation = 10.dp,
             tonalElevation = 0.dp,
-            border = androidx.compute.foundation.BorderStroke(
+            border = BorderStroke(
                 width = 1.dp,
                 color = Color.White.copy(alpha = 0.12f)
             )
