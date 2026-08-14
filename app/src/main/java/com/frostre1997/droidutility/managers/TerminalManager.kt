@@ -1,11 +1,9 @@
 package com.frostre1997.droidutility.managers
 
 import android.os.Build
-import jackpal.androidterm.emulatorview.TermSession
-import jackpal.androidterm.emulatorview.TerminalEmulator
-import jackpal.androidterm.emulatorview.EmulatorView
+import org.connectbot.term.TermSession
+import org.connectbot.term.TerminalEmulator
 import java.io.File
-import java.io.IOException
 
 object TerminalManager {
     private var session: TermSession? = null
@@ -42,21 +40,20 @@ object TerminalManager {
             Runtime.getRuntime().exec(arrayOf("/system/bin/sh"))
         }
 
-        // Set the prompt (cosmetic)
         val user = getUsername()
         val device = getDeviceName()
         val ps1 = "$user@$device ~$ "
 
+        // Set the prompt (cosmetic)
         try {
             process.outputStream.use {
                 it.write("export PS1='$ps1'\n".toByteArray())
                 it.flush()
             }
-        } catch (_: IOException) {
+        } catch (_: Exception) {
             // Ignore
         }
 
-        // Create terminal session
         val termSession = TermSession()
         val emulator = TerminalEmulator(
             termSession,
