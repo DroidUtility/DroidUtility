@@ -122,10 +122,8 @@ dependencies {
     implementation("dev.rikka.shizuku:api:13.1.5")
     implementation("dev.rikka.shizuku:provider:13.1.5")
 
-    // Terminal emulator (now from JitPack)
-    implementation("com.github.android-terminal-emulator:terminal-emulator:1.0.0")
-    // Alternative (Termux version – more actively maintained):
-    // implementation("com.termux:terminal-view:0.118.0")
+    // Terminal emulator (from JitPack)
+    implementation("com.termux:terminal-view:0.118.0")
 
     // Networking & serialization
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
