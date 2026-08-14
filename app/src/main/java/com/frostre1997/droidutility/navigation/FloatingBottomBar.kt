@@ -30,15 +30,19 @@ fun FloatingBottomBar(
         Screen.Settings
     )
 
+    // Outermost container is completely transparent by default
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding() // Pushes the layout safely above the system nav keys
+            .padding(bottom = 16.dp), // Adds a floating gap between the dock and screen edge
         contentAlignment = Alignment.BottomCenter
     ) {
         Surface(
             modifier = Modifier
-                .widthIn(max = 420.dp)
+                .widthIn(max = 440.dp) // Adjusted slightly higher to comfortably house 5 items
                 .height(68.dp)
-                .padding(horizontal = 4.dp),
+                .padding(horizontal = 16.dp),
             color = Color.Black.copy(alpha = 0.85f),
             shape = RoundedCornerShape(34.dp),
             shadowElevation = 10.dp,
@@ -67,7 +71,7 @@ fun FloatingBottomBar(
                             screen.icon,
                             contentDescription = screen.title,
                             tint = if (selected) colorScheme.primary else Color.White.copy(alpha = 0.6f),
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                         Text(
                             screen.title,
