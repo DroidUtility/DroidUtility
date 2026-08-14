@@ -80,8 +80,19 @@ android {
         kotlinCompilerExtensionVersion = "1.5.7"
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
     }
 
     packaging {
@@ -93,7 +104,7 @@ android {
 
 // --- Dependencies (ordered by category) ---
 dependencies {
-    // Compose BOM
+    // Compose BOM – unchanged
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.00"))
 
