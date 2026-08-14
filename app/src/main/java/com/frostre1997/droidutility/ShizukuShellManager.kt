@@ -5,8 +5,6 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 object ShizukuShellManager {
     private const val TAG = "ShizukuShellManager"
@@ -14,25 +12,23 @@ object ShizukuShellManager {
 
     @Volatile
     private var isBinderReceived = false
-    @Volatile
-    private var isPermissionGranted = false
+
+    // REMOVED: @Volatile private var isPermissionGranted = false
 
     private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
         isBinderReceived = true
-        isPermissionGranted = hasPermission()
         Log.i(TAG, "Shizuku binder received")
     }
 
     private val binderDeadListener = Shizuku.OnBinderDeadListener {
         isBinderReceived = false
-        isPermissionGranted = false
         Log.w(TAG, "Shizuku binder dead")
     }
 
     private val permissionResultListener = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
         if (requestCode == REQUEST_CODE) {
-            isPermissionGranted = grantResult == PackageManager.PERMISSION_GRANTED
-            Log.i(TAG, "Permission result: " + if (isPermissionGranted) "granted" else "denied")
+            val granted = grantResult == PackageManager.PERMISSION_GRANTED
+            Log.i(TAG, "Permission result: " + if (granted) "granted" else "denied")
         }
     }
 
@@ -64,6 +60,11 @@ object ShizukuShellManager {
         return runCatching { Shizuku.pingBinder() }.getOrDefault(false)
     }
 
+    /**
+     * Always check the actual permission state directly from Shizuku.
+     * No caching – this ensures the state is always correct,
+     * even after app updates or external grants.
+     */
     fun hasPermission(): Boolean {
         if (!checkAvailability() || Shizuku.isPreV11()) return false
         return runCatching {
@@ -77,7 +78,7 @@ object ShizukuShellManager {
             return
         }
         if (hasPermission()) {
-            isPermissionGranted = true
+            Log.i(TAG, "Permission already granted")
             return
         }
         runCatching {
@@ -88,8 +89,9 @@ object ShizukuShellManager {
     }
 
     /**
-     * Execute a shell command using `rish` (Shizuku's built‑in shell).
-     * If `rish` is not available, falls back to `sh` (no root/ADB).
+     * Execute a shell command. 
+     * - If Shizuku is available and permission is granted, it tries `rish` first.
+     * - Falls back to plain `sh` if `rish` fails or Shizuku is not available.
      */
     suspend fun executeCommand(command: String): ShellResult = withContext(Dispatchers.IO) {
         if (!checkAvailability() || !hasPermission()) {
