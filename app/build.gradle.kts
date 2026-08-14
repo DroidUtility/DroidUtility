@@ -59,12 +59,12 @@ val appVersionCode = semVerToCode(parsed)
 // --- Android configuration ---
 android {
     namespace = "com.frostre1997.droidutility"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.frostre1997.droidutility"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 10005
         versionName = "1.0.5-beta.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
