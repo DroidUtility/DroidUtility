@@ -21,7 +21,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.frostre1997.droidutility.managers.ShellManager
+import com.frostre1997.droidutility.core.ShellManager
 import kotlinx.coroutines.launch
 
 fun Context.toast(message: String) {
@@ -67,7 +67,6 @@ fun ShellScreen() {
             executeCommand(inputText)
             return true
         }
-        // Arrow up/down for history (optional)
         when (event.key) {
             Key.ArrowUp -> {
                 if (historyIndex > 0) {
