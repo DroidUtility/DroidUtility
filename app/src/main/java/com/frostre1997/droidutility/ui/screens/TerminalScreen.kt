@@ -15,7 +15,7 @@ fun TerminalScreen() {
     val session = remember { TerminalManager.startSession() }
 
     DisposableEffect(Unit) {
-        onDispose { /* keep alive */ }
+        onDispose { /* keep session alive */ }
     }
 
     Column(
@@ -25,8 +25,8 @@ fun TerminalScreen() {
     ) {
         AndroidView(
             factory = { context ->
-                EmulatorView(context).apply {
-                    attachSession(session)
+                EmulatorView(context, session).apply {
+                    // Classic terminal colours
                     setTextColor(0xFF00FF00.toInt())   // green
                     setBackgroundColor(0xFF000000.toInt()) // black
                     setCursorColor(0xFFFFFFFF.toInt()) // white
