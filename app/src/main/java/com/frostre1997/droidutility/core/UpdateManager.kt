@@ -45,10 +45,10 @@ object UpdateManager {
                 val release = Gson().fromJson(json, GitHubRelease::class.java)
                 val latestVersion = release.tag_name.replace("v", "")
                 val currentVersion = try {
-                    context.packageManager.getPackageInfo(context.packageName, 0).versionName
-                } catch (e: Exception) { return null }
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
+                } catch (e: Exception) { return "" }
 
-                if (latestVersion > currentVersion) {
+                if (compareVersions(latestVersion, currentVersion) > 0) {
                     val apkAsset = release.assets.find { it.name.endsWith(".apk") }
                     apkAsset?.browser_download_url ?: release.assets.firstOrNull()?.browser_download_url
                 } else {
