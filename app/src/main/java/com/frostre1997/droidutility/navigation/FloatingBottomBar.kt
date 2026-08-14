@@ -2,7 +2,7 @@ package com.frostre1997.droidutility.navigation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compute.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compute.ui.unit.dp
+import androidx.compute.ui.unit.sp
 import com.frostre1997.droidutility.Screen
 
 @Composable
@@ -38,11 +38,14 @@ fun FloatingBottomBar(
                 .widthIn(max = 420.dp)
                 .height(68.dp)
                 .padding(horizontal = 4.dp),
-            color = Color.Transparent,
+            color = Color.Black.copy(alpha = 0.85f),
             shape = RoundedCornerShape(34.dp),
-            shadowElevation = 0.dp,
+            shadowElevation = 10.dp,
             tonalElevation = 0.dp,
-            border = null
+            border = androidx.compute.foundation.BorderStroke(
+                width = 1.dp,
+                color = Color.White.copy(alpha = 0.12f)
+            )
         ) {
             Row(
                 modifier = Modifier.fillMaxSize(),
