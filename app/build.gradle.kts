@@ -128,7 +128,7 @@ dependencies {
     // DataStore & coroutines
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("com.github.frostre1997:securestash:v0.11.0")
+    implementation("com.github.frostre1997:securestash:834d607")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
