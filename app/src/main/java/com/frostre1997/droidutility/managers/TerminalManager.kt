@@ -1,9 +1,10 @@
-package com.frostre1997.droidutility.core
+package com.frostre1997.droidutility.managers
 
 import android.os.Build
-import com.android.terminal_emulator.TerminalEmulator
-import com.android.terminal_emulator.TerminalSession
+import jackpal.androidterm.emulatorview.TerminalSession
+import jackpal.androidterm.emulatorview.TerminalEmulator
 import java.io.File
+import java.io.IOException
 
 object TerminalManager {
     private var session: TerminalSession? = null
@@ -29,7 +30,12 @@ object TerminalManager {
             if (hasSu) {
                 Runtime.getRuntime().exec(arrayOf("su", "-c", "sh"))
             } else {
-                Runtime.getRuntime().exec(arrayOf("/data/local/tmp/rish", "-c", "sh"))
+                // Try rish (Shizuku) if available
+                try {
+                    Runtime.getRuntime().exec(arrayOf("/data/local/tmp/rish", "-c", "sh"))
+                } catch (_: Exception) {
+                    Runtime.getRuntime().exec(arrayOf("/system/bin/sh"))
+                }
             }
         } catch (_: Exception) {
             Runtime.getRuntime().exec(arrayOf("/system/bin/sh"))
@@ -39,9 +45,14 @@ object TerminalManager {
         val device = getDeviceName()
         val ps1 = "$user@$device ~$ "
 
-        process.outputStream.use {
-            it.write("export PS1='$ps1'\n".toByteArray())
-            it.flush()
+        // Set the prompt
+        try {
+            process.outputStream.use {
+                it.write("export PS1='$ps1'\n".toByteArray())
+                it.flush()
+            }
+        } catch (_: IOException) {
+            // Ignore
         }
 
         val termSession = TerminalSession()
