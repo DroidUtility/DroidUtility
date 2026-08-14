@@ -20,14 +20,12 @@ object PackageUtils {
         val pm = context.packageManager
         val packages = pm.getInstalledPackages(PackageManager.GET_META_DATA)
         return packages.map { pkg ->
-            
             val appInfo = pkg.applicationInfo
-            val flags = appInfo?.flags ?: 
-            
+            val flags = appInfo?.flags ?: 0
             InstalledApp(
                 packageName = pkg.packageName,
                 name = getAppName(pm, pkg),
-                isSystem = (pkg.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0,
+                isSystem = (flags and ApplicationInfo.FLAG_SYSTEM) != 0,
                 versionName = pkg.versionName ?: "unknown",
                 versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
                     pkg.longVersionCode
@@ -35,7 +33,7 @@ object PackageUtils {
                     @Suppress("DEPRECATION")
                     pkg.versionCode.toLong()
                 },
-                sizeBytes = pkg.applicationInfo?.sourceDir?.let { path ->
+                sizeBytes = appInfo?.sourceDir?.let { path ->
                     try {
                         java.io.File(path).length()
                     } catch (e: Exception) {
