@@ -123,7 +123,7 @@ dependencies {
     implementation("dev.rikka.shizuku:provider:13.1.5")
 
     // Terminal emulator (from JitPack)
-    implementation("com.termux:terminal-view:0.118.0")
+    implementation("com.github.jackpal:Android-Terminal-Emulator:v1.0.70")
 
     // Networking & serialization
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
