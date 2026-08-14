@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
+import androidx.compute.ui.geometry.Size
+import androidx.compute.ui.graphics.Color
+import androidx.compute.ui.input.key.Key
+import androidx.compute.ui.input.key.KeyEventType
 import androidx.compute.ui.input.key.key
 import androidx.compute.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalDensity
