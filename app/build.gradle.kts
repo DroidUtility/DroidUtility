@@ -122,8 +122,8 @@ dependencies {
     implementation("dev.rikka.shizuku:api:13.1.5")
     implementation("dev.rikka.shizuku:provider:13.1.5")
 
-    // Terminal emulator (from JitPack)
-    implementation("com.github.jackpal:Android-Terminal-Emulator:v1.0.70")
+    // Termlib (from Maven Central)
+    implementation("org.connectbot:termlib:0.0.36")
 
     // Networking & serialization
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
