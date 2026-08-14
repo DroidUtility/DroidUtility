@@ -2,6 +2,7 @@ package com.frostre1997.droidutility.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -66,6 +67,26 @@ fun ShellScreen() {
             executeCommand(inputText)
             return true
         }
+        // Arrow up/down for history (optional)
+        when (event.key) {
+            Key.ArrowUp -> {
+                if (historyIndex > 0) {
+                    historyIndex--
+                    inputText = history.getOrElse(historyIndex) { "" }
+                }
+                return true
+            }
+            Key.ArrowDown -> {
+                if (historyIndex < history.size - 1) {
+                    historyIndex++
+                    inputText = history.getOrElse(historyIndex) { "" }
+                } else {
+                    historyIndex = history.size
+                    inputText = ""
+                }
+                return true
+            }
+        }
         return false
     }
 
@@ -75,7 +96,7 @@ fun ShellScreen() {
             .background(Color.Black)
             .padding(16.dp)
     ) {
-        // Output
+        // Output area
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
@@ -106,7 +127,7 @@ fun ShellScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Input row with plain % prompt
+        // Input row
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -127,7 +148,7 @@ fun ShellScreen() {
                     fontFamily = FontFamily.Monospace,
                     fontSize = 14.sp
                 ),
-                colors = OutlinedTextFieldDefaults.colors(), // no named parameters
+                colors = OutlinedTextFieldDefaults.colors(),
                 modifier = Modifier
                     .weight(1f)
                     .onKeyEvent { handleKeyEvent(it) }
