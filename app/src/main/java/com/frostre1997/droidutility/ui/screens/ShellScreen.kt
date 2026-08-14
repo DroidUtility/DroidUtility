@@ -1,6 +1,5 @@
 package com.frostre1997.droidutility.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -14,8 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -23,15 +22,10 @@ import androidx.compose.ui.unit.sp
 import com.frostre1997.droidutility.core.ShellManager
 import kotlinx.coroutines.launch
 
-fun Context.toast(message: String) {
-    android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
-}
-
 data class ShellLine(val text: String, val isCommand: Boolean)
 
 @Composable
 fun ShellScreen() {
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var inputText by remember { mutableStateOf("") }
     val outputLines = remember { mutableStateListOf<ShellLine>() }
@@ -67,14 +61,14 @@ fun ShellScreen() {
             return true
         }
         when (event.key) {
-            Key.ArrowUp -> {
+            Key.DirectionUp -> {
                 if (historyIndex > 0) {
                     historyIndex--
                     inputText = history.getOrElse(historyIndex) { "" }
                 }
                 return true
             }
-            Key.ArrowDown -> {
+            Key.DirectionDown -> {
                 if (historyIndex < history.size - 1) {
                     historyIndex++
                     inputText = history.getOrElse(historyIndex) { "" }

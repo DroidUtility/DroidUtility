@@ -7,10 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.unit.sp
@@ -41,16 +44,15 @@ fun TerminalScreen() {
         }
         shellProcess = process
 
-        process.outputStream.use {
-            it.write("export PS1='$ '\n".toByteArray())
-            it.flush()
-        }
+        process.outputStream.write("export PS1='$ '\n".toByteArray())
+        process.outputStream.flush()
 
         coroutineScope.launch(Dispatchers.IO) {
             val reader = BufferedReader(InputStreamReader(process.inputStream))
             val buffer = CharArray(1024)
-            var len: Int
-            while (process.isAlive && reader.read(buffer).also { len = it } != -1) {
+            while (process.isAlive) {
+                val len = reader.read(buffer)
+                if (len == -1) break
                 val chunk = String(buffer, 0, len)
                 withContext(Dispatchers.Main) {
                     model.writeString(chunk)
@@ -83,24 +85,24 @@ fun TerminalScreen() {
                             coroutineScope.launch { model.inputChannel.send("\b") }
                             true
                         }
-                        Key.ArrowUp -> {
+                        Key.DirectionUp -> {
                             coroutineScope.launch { model.inputChannel.send("\u001B[A") }
                             true
                         }
-                        Key.ArrowDown -> {
+                        Key.DirectionDown -> {
                             coroutineScope.launch { model.inputChannel.send("\u001B[B") }
                             true
                         }
-                        Key.ArrowRight -> {
+                        Key.DirectionRight -> {
                             coroutineScope.launch { model.inputChannel.send("\u001B[C") }
                             true
                         }
-                        Key.ArrowLeft -> {
+                        Key.DirectionLeft -> {
                             coroutineScope.launch { model.inputChannel.send("\u001B[D") }
                             true
                         }
                         else -> {
-                            val c = event.key.code.toChar()
+                            val c = event.utf16CodePoint.toChar()
                             if (c.isLetterOrDigit() || c == ' ' || c in "!@#$%^&*()-_=+[]{};:'\",.<>/?") {
                                 coroutineScope.launch { model.inputChannel.send(c.toString()) }
                                 true
