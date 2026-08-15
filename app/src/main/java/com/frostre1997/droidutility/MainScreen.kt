@@ -24,7 +24,8 @@ fun MainScreen() {
             startDestination = Screen.Home.route,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 80.dp) // always reserve space for the bar
+                .statusBarsPadding()
+                .padding(bottom = 90.dp)
         ) {
             composable(Screen.Home.route) { HomeScreen() }
             composable(Screen.Terminal.route) { TerminalScreen() }
@@ -33,10 +34,10 @@ fun MainScreen() {
             composable(Screen.Settings.route) { SettingsScreen() }
         }
 
-        // Always show the floating bar
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
                 .padding(bottom = 16.dp)
         ) {
             FloatingBottomBar(
