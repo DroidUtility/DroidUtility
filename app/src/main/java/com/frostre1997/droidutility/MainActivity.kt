@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var settingsManager: SettingsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge() // 2. ADD THIS LINE HERE (Forces system bars to be transparent)
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         settingsManager = SettingsManager(this)
 
@@ -76,19 +76,20 @@ class MainActivity : ComponentActivity() {
                     androidx.compose.ui.platform.LocalDensity provides scaledDensity
                 ) {
                     if (showSplash) {
-                        // 3. Add system bar padding to splash so content doesn't bleed into status/nav bars
                         Box(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
                             SplashScreen()
                         }
                     } else {
                         if (!setupComplete) {
-                            SetupScreen(
-                                onSetupComplete = {
-                                    lifecycleScope.launch {
-                                        settingsManager.setSetupComplete(true)
+                            Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+                                SetupScreen(
+                                    onSetupComplete = {
+                                        lifecycleScope.launch {
+                                            settingsManager.setSetupComplete(true)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         } else {
                             Surface(modifier = Modifier.fillMaxSize()) {
                                 MainScreen()
