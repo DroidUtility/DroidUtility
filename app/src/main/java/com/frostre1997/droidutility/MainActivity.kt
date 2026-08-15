@@ -3,6 +3,7 @@ package com.frostre1997.droidutility
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var settingsManager: SettingsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge() // 2. ADD THIS LINE HERE (Forces system bars to be transparent)
         super.onCreate(savedInstanceState)
         settingsManager = SettingsManager(this)
 
@@ -74,7 +76,10 @@ class MainActivity : ComponentActivity() {
                     androidx.compose.ui.platform.LocalDensity provides scaledDensity
                 ) {
                     if (showSplash) {
-                        SplashScreen()
+                        // 3. Add system bar padding to splash so content doesn't bleed into status/nav bars
+                        Box(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
+                            SplashScreen()
+                        }
                     } else {
                         if (!setupComplete) {
                             SetupScreen(
@@ -106,7 +111,6 @@ fun SplashScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Using your monochrome icon
         Image(
             painter = painterResource(id = R.mipmap.ic_launcher_monochrome),
             contentDescription = "App Logo",
