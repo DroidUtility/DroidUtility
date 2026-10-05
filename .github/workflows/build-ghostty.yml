@@ -45,11 +45,11 @@ jobs:
 
       - name: Build x86
         run: |
-         cd ghostty
-         zig build -Demit-lib-vt=true -Dtarget=i686-linux-android -Doptimize=ReleaseSafe -Dsimd=false
-         mkdir -p ../out/x86
-         cp zig-out/lib/libghostty-vt.a ../out/x86/
-
+          cd ghostty
+          zig build -Demit-lib-vt=true -Dtarget=x86-linux-android -Doptimize=ReleaseSafe -Dsimd=false
+          mkdir -p ../out/x86
+          cp zig-out/lib/libghostty-vt.a ../out/x86/
+      
       - name: Copy headers
         run: |
           mkdir -p out/include
