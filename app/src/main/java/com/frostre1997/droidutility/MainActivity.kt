@@ -126,7 +126,7 @@ fun SplashScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "v1.0.5-beta.6",
+            text = "v1.0.5-beta.7",
             color = colorScheme.onSurfaceVariant,
             fontSize = 14.sp
         )
