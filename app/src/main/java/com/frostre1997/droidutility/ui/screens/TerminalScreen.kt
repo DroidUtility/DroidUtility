@@ -18,7 +18,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import com.frostre1997.droidutility.terminal.CellFlags
 import com.frostre1997.droidutility.terminal.GhosttyVt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,16 +42,6 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
         textSize = 36f
         isAntiAlias = true
     }
-    private val boldPaint = Paint().apply {
-        typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
-        textSize = 36f
-        isAntiAlias = true
-    }
-    private val italicPaint = Paint().apply {
-        typeface = Typeface.create(Typeface.MONOSPACE, Typeface.ITALIC)
-        textSize = 36f
-        isAntiAlias = true
-    }
 
     private var cellWidth: Float = 0f
     private var cellHeight: Int = 0
@@ -63,16 +52,11 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
     private var bitmapCanvas: Canvas? = null
     private var snapshotBuf: ByteBuffer? = null
 
-    private var scrollOffset: Int = 0
     private var lastTouchY: Float = 0f
 
     init {
         isFocusable = true
         isFocusableInTouchMode = true
-        calculateMetrics()
-    }
-
-    private fun calculateMetrics() {
         cellWidth = textPaint.measureText("M")
         val fm = textPaint.fontMetrics
         cellHeight = ceil(fm.descent - fm.ascent).toInt()
@@ -102,13 +86,13 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
 
     private fun allocateGridBuffers() {
         val bmp = Bitmap.createBitmap(
-            cols * cellWidth.toInt(),
+            (cols * cellWidth).toInt(),
             rows * cellHeight,
             Bitmap.Config.ARGB_8888
         )
         bitmap = bmp
         bitmapCanvas = Canvas(bmp)
-        val size = cols * rows * 32
+        val size = 4 + cols * rows * 16
         snapshotBuf = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder())
     }
 
@@ -127,49 +111,27 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
         val bc = bitmapCanvas ?: return
         bc.drawColor(android.graphics.Color.BLACK)
 
-        val rowCount = buf.getShort().toInt() and 0xFFFF
-        for (r in 0 until rowCount) {
-            val y = buf.getShort().toInt() and 0xFFFF
-            val cellCount = buf.getShort().toInt() and 0xFFFF
-            for (c in 0 until cellCount) {
-                val x = buf.getShort().toInt() and 0xFFFF
-                buf.getInt() // codepoint
-                val fg = buf.getInt()
-                val bg = buf.getInt()
-                val flags = buf.getInt()
-                val textLen = buf.getInt()
-                val textBytes = ByteArray(textLen)
-                buf.get(textBytes)
-                val text = String(textBytes, Charsets.UTF_8)
+        val c = buf.short.toInt() and 0xFFFF
+        val r = buf.short.toInt() and 0xFFFF
 
-                val left = x * cellWidth
-                val top = y * cellHeight.toFloat()
+        for (row in 0 until r) {
+            val top = row * cellHeight.toFloat()
+            for (col in 0 until c) {
+                val codepoint = buf.int
+                val fg = buf.int
+                val bg = buf.int
+                buf.int
 
-                if ((flags and CellFlags.INVERSE) != 0) {
-                    bc.drawRect(
-                        left, top, left + cellWidth, top + cellHeight,
-                        Paint().apply { color = fg }
-                    )
-                    textPaint.color = bg
-                } else {
-                    if (bg != 0) {
-                        bc.drawRect(
-                            left, top, left + cellWidth, top + cellHeight,
-                            Paint().apply { color = bg }
-                        )
-                    }
+                val left = col * cellWidth
+
+                if (bg != android.graphics.Color.BLACK) {
+                    bc.drawRect(left, top, left + cellWidth, top + cellHeight, Paint().apply { color = bg })
+                }
+
+                if (codepoint > 0 && codepoint != 0x20) {
+                    val text = String(Character.toChars(codepoint))
                     textPaint.color = fg
-                }
-
-                val paint = when {
-                    (flags and CellFlags.BOLD) != 0 ->
-                        boldPaint.apply { color = textPaint.color }
-                    (flags and CellFlags.ITALIC) != 0 ->
-                        italicPaint.apply { color = textPaint.color }
-                    else -> textPaint
-                }
-                if ((flags and CellFlags.INVISIBLE) == 0) {
-                    bc.drawText(text, left, top - textPaint.fontMetrics.ascent, paint)
+                    bc.drawText(text, left, top - textPaint.fontMetrics.ascent, textPaint)
                 }
             }
         }
@@ -187,8 +149,6 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
             MotionEvent.ACTION_MOVE -> {
                 val dy = event.y - lastTouchY
                 if (abs(dy) > 20f) {
-                    scrollOffset += if (dy > 0) 3 else -3
-                    scrollOffset = scrollOffset.coerceIn(0, 1000)
                     lastTouchY = event.y
                 }
                 return true
@@ -199,7 +159,7 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         val bytes = GhosttyVt.nativeEncodeKey(
-            handle, keyCode, 0, event.metaState, event.unicodeChar, null
+            handle, keyCode, 1, event.metaState, event.unicodeChar, null
         )
         if (bytes != null && bytes.isNotEmpty()) {
             onInputBytes?.invoke(bytes)
@@ -214,8 +174,7 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
         return object : BaseInputConnection(this, true) {
             override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
                 if (text != null) {
-                    val bytes = text.toString().toByteArray(Charsets.UTF_8)
-                    onInputBytes?.invoke(bytes)
+                    onInputBytes?.invoke(text.toString().toByteArray(Charsets.UTF_8))
                 }
                 return true
             }
@@ -232,9 +191,7 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
 
 @Composable
 fun TerminalScreen() {
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
     val viewRef = remember { arrayOfNulls<GhosttyTerminalView>(1) }
 
     AndroidView(
@@ -242,16 +199,10 @@ fun TerminalScreen() {
         factory = { ctx ->
             val view = GhosttyTerminalView(ctx)
 
-            val shellBinary = File(
-                ctx.filesDir, "zish"
-            ).absolutePath
-
+            val zish = File(ctx.filesDir, "zish")
+            val shellPath = if (zish.exists() && zish.canExecute()) zish.absolutePath else "/system/bin/sh"
             val process = try {
-                if (File(shellBinary).exists()) {
-                    ProcessBuilder(shellBinary).start()
-                } else {
-                    ProcessBuilder("/system/bin/sh").start()
-                }
+                ProcessBuilder(shellPath).start()
             } catch (e: Exception) {
                 ProcessBuilder("/system/bin/sh").start()
             }
@@ -265,31 +216,21 @@ fun TerminalScreen() {
                 }
             }
 
-            view.onGridResize = { _, _ -> }
-
             coroutineScope.launch(Dispatchers.IO) {
                 val buffer = ByteArray(4096)
                 val stream = process.inputStream
                 while (true) {
-                    val read = try {
-                        stream.read(buffer)
-                    } catch (e: Exception) {
-                        -1
-                    }
+                    val read = try { stream.read(buffer) } catch (e: Exception) { -1 }
                     if (read <= 0) break
                     val chunk = buffer.copyOf(read)
-                    withContext(Dispatchers.Main) {
-                        view.write(chunk)
-                    }
+                    withContext(Dispatchers.Main) { view.write(chunk) }
                 }
             }
 
             viewRef[0] = view
             view
         },
-        update = { view ->
-            view.requestFocus()
-        }
+        update = { it.requestFocus() }
     )
 
     DisposableEffect(Unit) {
