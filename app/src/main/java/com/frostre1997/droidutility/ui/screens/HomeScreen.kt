@@ -189,7 +189,7 @@ fun HomeScreen() {
             title = { Text("About DroidUtility", color = colorScheme.onSurface) },
             text = {
                 Column {
-                    Text("Version 1.0.5-beta.6", color = colorScheme.onSurface)
+                    Text("Version 1.0.5-beta.7", color = colorScheme.onSurface)
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = "A powerful non-root utility suite for Android. Built with 🤍 using Jetpack Compose.",
