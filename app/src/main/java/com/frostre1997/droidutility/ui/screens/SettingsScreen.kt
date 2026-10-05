@@ -552,7 +552,7 @@ fun SettingsScreen() {
             SettingsGroup(
                 title = "About",
                 items = listOf(
-                    SettingsItem.Label("Version 1.0.5-beta.6"),
+                    SettingsItem.Label("Version 1.0.5-beta.7"),
                     SettingsItem.Label("Built with 🤍 using Jetpack Compose"),
                     SettingsItem.Action("View Open Source Licenses") { /* open licenses */ },
                     SettingsItem.Action("Developer Info") { /* open developer info */ }
