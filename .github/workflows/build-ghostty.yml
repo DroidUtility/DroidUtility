@@ -1,0 +1,62 @@
+name: Build libghostty-vt
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-ghostty.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Ghostty
+        uses: actions/checkout@v4
+        with:
+          repository: ghostty-org/ghostty
+          ref: b0947378349eff70f7030dda0e6d022fae1e6fbd
+          path: ghostty
+
+      - name: Setup Zig 0.15.2
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.15.2
+
+      - name: Build arm64-v8a
+        run: |
+          cd ghostty
+          zig build lib-vt -Dtarget=aarch64-linux-android -Doptimize=ReleaseSafe -Dsimd=false
+          mkdir -p ../out/arm64-v8a
+          cp zig-out/lib/libghostty-vt.a ../out/arm64-v8a/
+
+      - name: Build x86_64
+        run: |
+          cd ghostty
+          zig build lib-vt -Dtarget=x86_64-linux-android -Doptimize=ReleaseSafe -Dsimd=false
+          mkdir -p ../out/x86_64
+          cp zig-out/lib/libghostty-vt.a ../out/x86_64/
+
+      - name: Build armeabi-v7a
+        run: |
+          cd ghostty
+          zig build lib-vt -Dtarget=arm-linux-androideabi -Doptimize=ReleaseSafe -Dsimd=false
+          mkdir -p ../out/armeabi-v7a
+          cp zig-out/lib/libghostty-vt.a ../out/armeabi-v7a/
+
+      - name: Build x86
+        run: |
+          cd ghostty
+          zig build lib-vt -Dtarget=i686-linux-android -Doptimize=ReleaseSafe -Dsimd=false
+          mkdir -p ../out/x86
+          cp zig-out/lib/libghostty-vt.a ../out/x86/
+
+      - name: Copy headers
+        run: |
+          mkdir -p out/include
+          cp -r ghostty/include/ghostty out/include/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libghostty-vt-all-abis
+          path: out/
