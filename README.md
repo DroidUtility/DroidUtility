@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/frostre1997/DroidUtility/main/app/src/main/res/drawable/play_store_512.png" alt="DroidUtility Logo" width="500" style="border-radius: 50px; box-shadow: 0 7px 8px rgba(0,0,0,0.2);">
+  <img src="https://raw.githubusercontent.com/frostre1997/DroidUtility/main/image/Icon.png" alt="DroidUtility Logo" width="500" style="border-radius: 50px; box-shadow: 0 7px 8px rgba(0,0,0,0.2);">
 </p>
 
 <p align="center">
