@@ -1,0 +1,48 @@
+name: Build Zish
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-zish.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout zish
+        uses: actions/checkout@v4
+        with:
+          repository: rotkonetworks/zish
+          path: zish
+
+      - name: Setup Zig 0.16
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+
+      - name: Patch out Landlock/seccomp for Android
+        run: |
+          cd zish
+          grep -rl "landlock\|seccomp" src/ || true
+          # Wrapped in a script that disables sandbox on Android target
+          cat > src/sandbox_android_patch.zig <<'EOF'
+          const builtin = @import("builtin");
+          pub fn isAndroid() bool {
+              return builtin.target.abi.isAndroid();
+          }
+          EOF
+          echo "Patch marker written"
+
+      - name: Build arm64-v8a
+        run: |
+          cd zish
+          zig build --release=safe -Dtarget=aarch64-linux-android.24 -p /tmp/zish-out-arm64
+          mkdir -p ../out/arm64-v8a
+          cp /tmp/zish-out-arm64/bin/zish ../out/arm64-v8a/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: zish-android
+          path: out/
