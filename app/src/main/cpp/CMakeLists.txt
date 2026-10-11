@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.22.1)
 project("droidutility_terminal")
 
-add_library(droidutility_terminal SHARED ghostty_jni.cpp)
+add_library(droidutility_terminal SHARED
+    ghostty_jni.cpp
+    tls_shim.c)
 
 target_include_directories(droidutility_terminal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/include)
 
