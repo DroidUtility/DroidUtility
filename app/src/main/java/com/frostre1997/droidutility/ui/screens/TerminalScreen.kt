@@ -16,9 +16,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.frostre1997.droidutility.terminal.GhosttyVt
+import com.frostre1997.droidutility.terminal.Pty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -114,6 +114,8 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
         val c = buf.short.toInt() and 0xFFFF
         val r = buf.short.toInt() and 0xFFFF
 
+        val bgPaint = Paint()
+
         for (row in 0 until r) {
             val top = row * cellHeight.toFloat()
             for (col in 0 until c) {
@@ -125,7 +127,8 @@ class GhosttyTerminalView(context: android.content.Context) : View(context) {
                 val left = col * cellWidth
 
                 if (bg != android.graphics.Color.BLACK) {
-                    bc.drawRect(left, top, left + cellWidth, top + cellHeight, Paint().apply { color = bg })
+                    bgPaint.color = bg
+                    bc.drawRect(left, top, left + cellWidth, top + cellHeight, bgPaint)
                 }
 
                 if (codepoint > 0 && codepoint != 0x20) {
@@ -199,34 +202,66 @@ fun TerminalScreen() {
         factory = { ctx ->
             val view = GhosttyTerminalView(ctx)
 
-            val zish = File(ctx.filesDir, "zish")
-            val shellPath = if (zish.exists() && zish.canExecute()) zish.absolutePath else "/system/bin/sh"
-            val process = try {
-                ProcessBuilder(shellPath).start()
-            } catch (e: Exception) {
-                ProcessBuilder("/system/bin/sh").start()
+            val filesDir = ctx.filesDir.absolutePath
+            val shellPath = File(ctx.filesDir, "zish").takeIf { it.exists() && it.canExecute() }
+                ?.absolutePath
+
+            if (shellPath == null) {
+                viewRef[0] = view
+                return@AndroidView view
             }
 
-            view.onInputBytes = { bytes ->
-                coroutineScope.launch(Dispatchers.IO) {
-                    try {
-                        process.outputStream.write(bytes)
-                        process.outputStream.flush()
-                    } catch (_: Exception) {}
-                }
+            val envList = listOf(
+                "HOME=$filesDir",
+                "TERM=xterm-256color",
+                "PATH=$filesDir:/system/bin",
+                "SHELL=$shellPath",
+                "USER=shell",
+                "LANG=en_US.UTF-8"
+            )
+
+            val fds = IntArray(2)
+            val ok = Pty.nativeForkPty(
+                binary = shellPath,
+                args = arrayOf(shellPath, "-l"),
+                envVars = envList.toTypedArray(),
+                cwd = filesDir,
+                outFd = fds
+            )
+
+            if (ok != 0) {
+                viewRef[0] = view
+                return@AndroidView view
             }
+
+            val masterFd = fds[0]
+            val pid = fds[1]
+
+            Pty.nativeSetWindowSize(masterFd, 80, 24)
 
             coroutineScope.launch(Dispatchers.IO) {
-                val buffer = ByteArray(4096)
-                val stream = process.inputStream
+                val buf = ByteArray(8192)
                 while (true) {
-                    val read = try { stream.read(buffer) } catch (e: Exception) { -1 }
-                    if (read <= 0) break
-                    val chunk = buffer.copyOf(read)
+                    val n = Pty.nativeRead(masterFd, buf)
+                    if (n <= 0) break
+                    val chunk = buf.copyOf(n)
                     withContext(Dispatchers.Main) { view.write(chunk) }
                 }
             }
 
+            view.onInputBytes = { bytes ->
+                coroutineScope.launch(Dispatchers.IO) {
+                    Pty.nativeWrite(masterFd, bytes)
+                }
+            }
+
+            view.onGridResize = { c, r ->
+                coroutineScope.launch(Dispatchers.IO) {
+                    Pty.nativeSetWindowSize(masterFd, c, r)
+                }
+            }
+
+            view.setTag(android.R.id.content, intArrayOf(masterFd, pid))
             viewRef[0] = view
             view
         },
@@ -235,7 +270,15 @@ fun TerminalScreen() {
 
     DisposableEffect(Unit) {
         onDispose {
-            viewRef[0]?.destroy()
+            val view = viewRef[0]
+            if (view != null) {
+                val tag = view.getTag(android.R.id.content) as? IntArray
+                if (tag != null) {
+                    Pty.nativeCloseFd(tag[0])
+                    Pty.nativeWaitFor(tag[1])
+                }
+                view.destroy()
+            }
             viewRef[0] = null
         }
     }
