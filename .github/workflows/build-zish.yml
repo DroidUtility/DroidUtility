@@ -9,9 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout zish
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: rotkonetworks/zish
           path: zish
@@ -21,28 +22,122 @@ jobs:
         with:
           version: 0.16.0
 
-      - name: Patch out Landlock/seccomp for Android
+      - name: Locate Android NDK
+        id: ndk
+        run: |
+          for VAR in ANDROID_NDK_LATEST_HOME ANDROID_NDK_HOME ANDROID_NDK_ROOT; do
+            if [ -n "${!VAR}" ] && [ -d "${!VAR}" ]; then
+              echo "Found NDK at $VAR = ${!VAR}"
+              echo "path=${!VAR}" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          done
+          for CANDIDATE in /usr/local/lib/android/sdk/ndk/* /opt/android-sdk/ndk/*; do
+            if [ -d "$CANDIDATE" ]; then
+              echo "Found NDK at $CANDIDATE"
+              echo "path=$CANDIDATE" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          done
+          echo "ERROR: No NDK found"
+          exit 1
+
+      - name: Audit sandbox code
         run: |
           cd zish
-          grep -rl "landlock\|seccomp" src/ || true
-          # Wrapped in a script that disables sandbox on Android target
-          cat > src/sandbox_android_patch.zig <<'EOF'
-          const builtin = @import("builtin");
-          pub fn isAndroid() bool {
-              return builtin.target.abi.isAndroid();
-          }
-          EOF
-          echo "Patch marker written"
+          echo "=== Files mentioning landlock/seccomp ==="
+          grep -rln "landlock\|seccomp" src/ || echo "(none found)"
+          echo ""
+          echo "=== main.zig init calls ==="
+          grep -n "sandbox\|landlock\|seccomp\|init" src/main.zig | head -30 || true
 
       - name: Build arm64-v8a
         run: |
+          NDK="${{ steps.ndk.outputs.path }}"
+          SYSROOT="$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
           cd zish
-          zig build --release=safe -Dtarget=aarch64-linux-android.24 -p /tmp/zish-out-arm64
+          cat > libc.txt <<EOF
+          include_dir=$SYSROOT/usr/include
+          sys_include_dir=$SYSROOT/usr/include/aarch64-linux-android
+          crt_dir=$SYSROOT/usr/lib/aarch64-linux-android/24
+          msvc_lib_dir=
+          kernel32_lib_dir=
+          gcc_dir=
+          EOF
+          zig build --release=safe \
+            -Dtarget=aarch64-linux-android.24 \
+            --libc libc.txt \
+            -p /tmp/zish-out-arm64
           mkdir -p ../out/arm64-v8a
           cp /tmp/zish-out-arm64/bin/zish ../out/arm64-v8a/
+          file ../out/arm64-v8a/zish
+
+      - name: Build armeabi-v7a
+        run: |
+          NDK="${{ steps.ndk.outputs.path }}"
+          SYSROOT="$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+          cd zish
+          cat > libc.txt <<EOF
+          include_dir=$SYSROOT/usr/include
+          sys_include_dir=$SYSROOT/usr/include/arm-linux-androideabi
+          crt_dir=$SYSROOT/usr/lib/arm-linux-androideabi/24
+          msvc_lib_dir=
+          kernel32_lib_dir=
+          gcc_dir=
+          EOF
+          zig build --release=safe \
+            -Dtarget=arm-linux-androideabi.24 \
+            --libc libc.txt \
+            -p /tmp/zish-out-armv7
+          mkdir -p ../out/armeabi-v7a
+          cp /tmp/zish-out-armv7/bin/zish ../out/armeabi-v7a/
+          file ../out/armeabi-v7a/zish
+
+      - name: Build x86
+        run: |
+          NDK="${{ steps.ndk.outputs.path }}"
+          SYSROOT="$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+          cd zish
+          cat > libc.txt <<EOF
+          include_dir=$SYSROOT/usr/include
+          sys_include_dir=$SYSROOT/usr/include/i686-linux-android
+          crt_dir=$SYSROOT/usr/lib/i686-linux-android/24
+          msvc_lib_dir=
+          kernel32_lib_dir=
+          gcc_dir=
+          EOF
+          zig build --release=safe \
+            -Dtarget=x86-linux-android.24 \
+            --libc libc.txt \
+            -p /tmp/zish-out-x86
+          mkdir -p ../out/x86
+          cp /tmp/zish-out-x86/bin/zish ../out/x86/
+          file ../out/x86/zish
+
+      - name: Build x86_64
+        run: |
+          NDK="${{ steps.ndk.outputs.path }}"
+          SYSROOT="$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+          cd zish
+          cat > libc.txt <<EOF
+          include_dir=$SYSROOT/usr/include
+          sys_include_dir=$SYSROOT/usr/include/x86_64-linux-android
+          crt_dir=$SYSROOT/usr/lib/x86_64-linux-android/24
+          msvc_lib_dir=
+          kernel32_lib_dir=
+          gcc_dir=
+          EOF
+          zig build --release=safe \
+            -Dtarget=x86_64-linux-android.24 \
+            --libc libc.txt \
+            -p /tmp/zish-out-x86_64
+          mkdir -p ../out/x86_64
+          cp /tmp/zish-out-x86_64/bin/zish ../out/x86_64/
+          file ../out/x86_64/zish
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: zish-android
           path: out/
+          if-no-files-found: error
