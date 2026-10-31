@@ -12,9 +12,9 @@ jobs:
 
     steps:
       - name: Checkout zish
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
-          repository: rotkonetworks/zish
+          repository: frostre1997/zish
           path: zish
 
       - name: Setup Zig 0.16
@@ -42,15 +42,6 @@ jobs:
           echo "ERROR: No NDK found"
           exit 1
 
-      - name: Audit sandbox code
-        run: |
-          cd zish
-          echo "=== Files mentioning landlock/seccomp ==="
-          grep -rln "landlock\|seccomp" src/ || echo "(none found)"
-          echo ""
-          echo "=== main.zig init calls ==="
-          grep -n "sandbox\|landlock\|seccomp\|init" src/main.zig | head -30 || true
-
       - name: Build arm64-v8a
         run: |
           NDK="${{ steps.ndk.outputs.path }}"
@@ -64,10 +55,7 @@ jobs:
           kernel32_lib_dir=
           gcc_dir=
           EOF
-          zig build --release=safe \
-            -Dtarget=aarch64-linux-android.24 \
-            --libc libc.txt \
-            -p /tmp/zish-out-arm64
+          zig build --release=safe -Dtarget=aarch64-linux-android.24 --libc libc.txt -p /tmp/zish-out-arm64
           mkdir -p ../out/arm64-v8a
           cp /tmp/zish-out-arm64/bin/zish ../out/arm64-v8a/
           file ../out/arm64-v8a/zish
@@ -85,10 +73,7 @@ jobs:
           kernel32_lib_dir=
           gcc_dir=
           EOF
-          zig build --release=safe \
-            -Dtarget=arm-linux-androideabi.24 \
-            --libc libc.txt \
-            -p /tmp/zish-out-armv7
+          zig build --release=safe -Dtarget=arm-linux-androideabi.24 --libc libc.txt -p /tmp/zish-out-armv7
           mkdir -p ../out/armeabi-v7a
           cp /tmp/zish-out-armv7/bin/zish ../out/armeabi-v7a/
           file ../out/armeabi-v7a/zish
@@ -106,10 +91,7 @@ jobs:
           kernel32_lib_dir=
           gcc_dir=
           EOF
-          zig build --release=safe \
-            -Dtarget=x86-linux-android.24 \
-            --libc libc.txt \
-            -p /tmp/zish-out-x86
+          zig build --release=safe -Dtarget=x86-linux-android.24 --libc libc.txt -p /tmp/zish-out-x86
           mkdir -p ../out/x86
           cp /tmp/zish-out-x86/bin/zish ../out/x86/
           file ../out/x86/zish
@@ -127,16 +109,13 @@ jobs:
           kernel32_lib_dir=
           gcc_dir=
           EOF
-          zig build --release=safe \
-            -Dtarget=x86_64-linux-android.24 \
-            --libc libc.txt \
-            -p /tmp/zish-out-x86_64
+          zig build --release=safe -Dtarget=x86_64-linux-android.24 --libc libc.txt -p /tmp/zish-out-x86_64
           mkdir -p ../out/x86_64
           cp /tmp/zish-out-x86_64/bin/zish ../out/x86_64/
           file ../out/x86_64/zish
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: zish-android
           path: out/
