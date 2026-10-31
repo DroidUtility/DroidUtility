@@ -1,6 +1,5 @@
 package com.frostre1997.droidutility.ui.screens
 
-import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,55 +21,34 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.frostre1997.droidutility.ShizukuShellManager
+import com.frostre1997.droidutility.data.BloatAppModel
+import com.frostre1997.droidutility.data.RemovalRecommendation
+import com.frostre1997.droidutility.engine.DebloatEngine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-data class AppInfo(
-    val packageName: String,
-    val appName: String,
-    val versionName: String,
-    val versionCode: Long,
-    val isSystemApp: Boolean,
-    val isEnabled: Boolean,
-    val icon: Drawable?
-)
 
 @Composable
 fun DebloatScreen() {
     val context = LocalContext.current
     val colorScheme = MaterialTheme.colorScheme
     val coroutineScope = rememberCoroutineScope()
+    
     var searchQuery by remember { mutableStateOf("") }
     var showSystemApps by remember { mutableStateOf(true) }
     var showEnabledApps by remember { mutableStateOf(true) }
     var showDisabledApps by remember { mutableStateOf(true) }
-    var appList by remember { mutableStateOf<List<AppInfo>>(emptyList()) }
+    var showRecommendedOnly by remember { mutableStateOf(false) } // New UAD Filter
+    
+    var appList by remember { mutableStateOf<List<BloatAppModel>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
-            val pm = context.packageManager
-            val installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
-            val list = installedApps.mapNotNull { app ->
-                try {
-                    AppInfo(
-                        packageName = app.packageName,
-                        appName = pm.getApplicationLabel(app).toString(),
-                        versionName = pm.getPackageInfo(app.packageName, 0).versionName ?: "Unknown",
-                        versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                            pm.getPackageInfo(app.packageName, 0).longVersionCode
-                        } else { 0 },
-                        isSystemApp = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0,
-                        isEnabled = app.enabled,
-                        icon = app.loadIcon(pm)
-                    )
-                } catch (_: Exception) { null }
-            }
-            appList = list
+            appList = DebloatEngine.getInstalledAppsWithUad(context)
             isLoading = false
         }
     }
@@ -86,36 +64,26 @@ fun DebloatScreen() {
             showDisabledApps -> !app.isEnabled
             else -> true
         }
-        matchesSearch && matchesSystem && matchesState
+        val matchesUad = if (showRecommendedOnly) {
+            app.recommendation == RemovalRecommendation.RECOMMENDED
+        } else true
+        
+        matchesSearch && matchesSystem && matchesState && matchesUad
     }
 
-    fun performAction(app: AppInfo, action: String) {
+    fun performAction(app: BloatAppModel, action: String) {
         coroutineScope.launch {
-            val command = when (action) {
-                "disable" -> "pm disable ${app.packageName}"
-                "enable" -> "pm enable ${app.packageName}"
-                "uninstall" -> "pm uninstall ${app.packageName}"
+            val result = when (action) {
+                "disable" -> DebloatEngine.disablePackage(app.packageName)
+                "enable" -> DebloatEngine.enablePackage(app.packageName)
+                "uninstall" -> DebloatEngine.uninstallPackage(app.packageName)
                 else -> return@launch
             }
-            val result = ShizukuShellManager.executeCommand(command)
+            
             if (result.success) {
+                // Refresh list
                 withContext(Dispatchers.IO) {
-                    val pm = context.packageManager
-                    val installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
-                    val list = installedApps.mapNotNull { a ->
-                        try {
-                            AppInfo(
-                                packageName = a.packageName,
-                                appName = pm.getApplicationLabel(a).toString(),
-                                versionName = pm.getPackageInfo(a.packageName, 0).versionName ?: "Unknown",
-                                versionCode = 0,
-                                isSystemApp = (a.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0,
-                                isEnabled = a.enabled,
-                                icon = a.loadIcon(pm)
-                            )
-                        } catch (_: Exception) { null }
-                    }
-                    appList = list
+                    appList = DebloatEngine.getInstalledAppsWithUad(context)
                 }
             }
         }
@@ -124,36 +92,22 @@ fun DebloatScreen() {
     Column(
         modifier = Modifier.fillMaxSize().background(colorScheme.background)
     ) {
-        // Search bar – fixed (no named color parameters)
+        // Search bar
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { 
-                Text(
-                    text = "Search apps...", 
-                    color = colorScheme.onSurfaceVariant
-                ) 
-            },
-            leadingIcon = { 
-                Icon(
-                    Icons.Default.Search, 
-                    contentDescription = null, 
-                    tint = colorScheme.onSurfaceVariant
-                ) 
-            },
+            placeholder = { Text("Search apps...", color = colorScheme.onSurfaceVariant) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = colorScheme.onSurfaceVariant) },
             textStyle = TextStyle(color = colorScheme.onSurface),
-            colors = OutlinedTextFieldDefaults.colors(), // no arguments – uses theme defaults
+            colors = OutlinedTextFieldDefaults.colors(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .background(colorScheme.surface, shape = RoundedCornerShape(16.dp))
-                .border(
-                    1.dp, 
-                    colorScheme.onSurfaceVariant.copy(alpha = 0.3f), 
-                    RoundedCornerShape(16.dp)
-                )
+                .border(1.dp, colorScheme.onSurfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
         )
 
+        // Filter Chips
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -162,28 +116,26 @@ fun DebloatScreen() {
                 selected = showSystemApps,
                 onClick = { showSystemApps = !showSystemApps },
                 label = { Text("System", color = colorScheme.onSurface) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = colorScheme.primary.copy(alpha = 0.2f),
-                    selectedLabelColor = colorScheme.primary
-                )
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = colorScheme.primary)
             )
             FilterChip(
                 selected = showEnabledApps,
                 onClick = { showEnabledApps = !showEnabledApps },
                 label = { Text("Enabled", color = colorScheme.onSurface) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = colorScheme.primary.copy(alpha = 0.2f),
-                    selectedLabelColor = colorScheme.primary
-                )
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = colorScheme.primary)
             )
             FilterChip(
                 selected = showDisabledApps,
                 onClick = { showDisabledApps = !showDisabledApps },
                 label = { Text("Disabled", color = colorScheme.onSurface) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = colorScheme.primary.copy(alpha = 0.2f),
-                    selectedLabelColor = colorScheme.primary
-                )
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = colorScheme.primary.copy(alpha = 0.2f), selectedLabelColor = colorScheme.primary)
+            )
+            // UAD Filter
+            FilterChip(
+                selected = showRecommendedOnly,
+                onClick = { showRecommendedOnly = !showRecommendedOnly },
+                label = { Text("Safe", color = colorScheme.onSurface) },
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color.Green.copy(alpha = 0.2f), selectedLabelColor = Color.Green)
             )
         }
 
@@ -207,7 +159,7 @@ fun DebloatScreen() {
 }
 
 @Composable
-fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
+fun AppItem(app: BloatAppModel, onAction: (String) -> Unit) {
     val colorScheme = MaterialTheme.colorScheme
     var expanded by remember { mutableStateOf(false) }
 
@@ -216,47 +168,75 @@ fun AppItem(app: AppInfo, onAction: (String) -> Unit) {
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded }
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(modifier = Modifier.size(40.dp)) {
-                if (app.icon != null) {
-                    Image(
-                        bitmap = app.icon.toBitmap().asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(app.appName, color = colorScheme.onSurface, fontWeight = FontWeight.Medium)
-                Text(app.packageName, color = colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (app.isSystemApp) {
-                        Badge(containerColor = colorScheme.primary.copy(alpha = 0.2f)) {
-                            Text("System", color = colorScheme.primary, fontSize = 10.sp)
-                        }
-                    }
-                    Badge(
-                        containerColor = if (app.isEnabled) Color.Green.copy(alpha = 0.2f) else Color.Red.copy(alpha = 0.2f)
-                    ) {
-                        Text(
-                            if (app.isEnabled) "Enabled" else "Disabled",
-                            color = if (app.isEnabled) Color.Green else Color.Red,
-                            fontSize = 10.sp
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(40.dp)) {
+                    if (app.icon != null) {
+                        Image(
+                            bitmap = app.icon.toBitmap().asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
                 }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(app.appName, color = colorScheme.onSurface, fontWeight = FontWeight.Medium)
+                    Text(app.packageName, color = colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                    
+                    // UAD Badges Row
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
+                        if (app.isSystemApp) {
+                            Badge(containerColor = colorScheme.primary.copy(alpha = 0.2f)) {
+                                Text("System", color = colorScheme.primary, fontSize = 10.sp)
+                            }
+                        }
+                        Badge(
+                            containerColor = if (app.isEnabled) Color.Green.copy(alpha = 0.2f) else Color.Red.copy(alpha = 0.2f)
+                        ) {
+                            Text(
+                                if (app.isEnabled) "Enabled" else "Disabled",
+                                color = if (app.isEnabled) Color.Green else Color.Red,
+                                fontSize = 10.sp
+                            )
+                        }
+                        
+                        // UAD Recommendation Badge
+                        if (app.recommendation != RemovalRecommendation.UNLISTED) {
+                            val badgeColor = when (app.recommendation) {
+                                RemovalRecommendation.RECOMMENDED -> Color(0xFF4CAF50)
+                                RemovalRecommendation.ADVANCED -> Color(0xFFFFEB3B)
+                                RemovalRecommendation.EXPERT -> Color(0xFFFF9800)
+                                RemovalRecommendation.UNSAFE -> Color(0xFFF44336)
+                                else -> Color.Gray
+                            }
+                            Badge(containerColor = badgeColor.copy(alpha = 0.2f)) {
+                                Text(app.recommendation.name, color = badgeColor, fontSize = 10.sp)
+                            }
+                        }
+                    }
+                }
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(24.dp)
+                )
             }
-            Icon(
-                Icons.Default.KeyboardArrowRight,
-                contentDescription = null,
-                tint = colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(24.dp)
-            )
+
+            // UAD Description
+            app.uadInfo?.description?.let { desc ->
+                Text(
+                    text = desc,
+                    fontSize = 12.sp,
+                    color = colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
+
         if (expanded) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
