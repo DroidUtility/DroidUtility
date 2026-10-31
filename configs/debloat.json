@@ -1,8 +1,0 @@
-{
-  "name": "Default Debloat List",
-  "packages": [
-    "com.bloatware.example1",
-    "com.bloatware.example2",
-    "com.android.providers.partnerbookmarks"
-  ]
-}
