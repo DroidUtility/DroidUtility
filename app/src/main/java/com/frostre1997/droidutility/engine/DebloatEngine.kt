@@ -55,4 +55,24 @@ object DebloatEngine {
         val message = if (result.success) result.output else result.error.takeIf { it.isNotBlank() } ?: "Command failed"
         return DebloatResult(packageName, "clear", result.success, message)
     }
+
+    // NEW FUNCTION: Fetch and merge apps with UAD data
+    suspend fun getInstalledAppsWithUad(context: Context): List<BloatAppModel> {
+        val uadList = UadRepository.fetchUadList()
+        val pm = context.packageManager
+        val installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+
+        return installedApps.mapNotNull { app ->
+            try {
+                BloatAppModel(
+                    packageName = app.packageName,
+                    appName = pm.getApplicationLabel(app).toString(),
+                    isSystemApp = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0,
+                    isEnabled = app.enabled,
+                    icon = app.loadIcon(pm),
+                    uadInfo = uadList[app.packageName] // Attach UAD data
+                )
+            } catch (_: Exception) { null }
+        }
+    }
 }
