@@ -78,10 +78,10 @@ cd DroidUtility
 ./gradlew assembleDebug
 ```
 
-Note: The libghostty-vt native library is pre-compiled in the app/src/main/cpp/vendor/ directory. If you are modifying the native terminal code, you will need to cross-compile the Zig library manually.
+> Note: The libghostty-vt native library is pre-compiled in the app/src/main/cpp/vendor/ directory. If you are modifying the native terminal code, you will need to cross-compile the Zig library manually.
 
 ---
 
-Visit our website 🤍
+## Visit our website 🤍
 
 https://droidutility.github.io/DroidUtility/
