@@ -26,7 +26,7 @@ fun FloatingBottomBar(
         Screen.Home,
         Screen.Terminal,
         Screen.Debloat,
-        Screen.Shell,
+        Screen.Tweaks,
         Screen.Settings
     )
 
