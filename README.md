@@ -22,10 +22,11 @@ A powerful, non-root utility suite for Android designed for system optimization,
 - **True Interactive Terminal:** A fully functional terminal experience powered by a custom native engine (`libghostty-vt` + PTY). Supports real-time ANSI rendering, interactive prompts, and shell environments (utilizing a custom Zig-based shell).
 - **Debloat Manager:** View all installed apps, search, and filter by System/User. Disable or uninstall bloatware with one tap using Shizuku privileges.
 - **Dashboard (Home):** A clean, focused overview of your device's status, Shizuku connection, and app statistics.
+- **System Status:** (Coming soon – currently removed for stability).
 - **Material 3 Expressive UI:** Modern, fluid design with full dynamic color support (Material You), user-selectable accent seed colors, and adjustable UI scaling.
 - **Theme Support:** Light, Dark, AMOLED (true black), and System themes with persistent storage.
 - **Universal Architecture:** Built natively for all Android ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`).
-- **Xposed / LSPatch Integration:** Xposed Module Implementation for more customizable apps – planned for a future update.
+- **Xposed / LSPatch Integration:** Xposed Module Implementation for more customizable apps – planned for update V1.1.0-beta.
 
 ---
 
