@@ -84,4 +84,4 @@ cd DroidUtility
 
 ## Visit our website 🤍
 
-https://droidutility.github.io/DroidUtility/
+https://droidutility.github.io/
